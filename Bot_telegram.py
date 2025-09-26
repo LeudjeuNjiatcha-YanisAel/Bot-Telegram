@@ -258,7 +258,7 @@ def ask(update,context):
         return
 
     try:
-        client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
+        client = genai.Client(api_key="Cle Gemini AI Studio")
 
         response = client.models.generate_content(
             model="gemini-2.0-flash",
