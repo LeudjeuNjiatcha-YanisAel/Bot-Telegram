@@ -196,6 +196,7 @@ def gen_phrase(update,context):
     shuffle(mots)
     phrase = ' '.join(mots).capitalize() + '.'
     update.message.reply_text("Voici une phrase :")
+
     update.message.reply_text(phrase)
 
 def pin(update,context):
