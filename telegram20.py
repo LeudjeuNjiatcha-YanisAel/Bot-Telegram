@@ -766,7 +766,7 @@ if __name__ == "__main__":
     
     # Lancement du bot
     print("Machine_Bot a démarré...")
-    await send_online(app.bot,"🤖 Le bot est en ligne ✅")   
+    send_online(app.bot,"🤖 Le bot est en ligne ✅")   
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
     app.run_polling()
