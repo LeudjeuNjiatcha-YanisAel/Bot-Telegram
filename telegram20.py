@@ -268,12 +268,12 @@ async def ask(update,context):
         client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-pro",
             contents=question
         )
 
         answer = response.text
-        for i in range(0,len(answer),1000) :
+        for i in range(0,len(answer),2000) :
             await update.message.reply_text("Machine_IA🤖 \n ")
             await update.message.reply_text("💡 Réponse : "+answer[i:i+2000])
     except Exception as e:
@@ -691,7 +691,7 @@ async def play(update,context):
         await update.message.reply_text(f"Erreur : {e}")        
 
 async def main():
-    app = ApplicationBuilder().token(TOKEN).build()
+    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
     
     app.add_handler(CommandHandler("start",start))
     app.add_handler(CommandHandler("help",help_command))
