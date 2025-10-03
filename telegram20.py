@@ -733,7 +733,44 @@ async def main():
     await app.run_polling()
   
 if __name__ == "__main__":    
-    asyncio.run(main())
+    import nest_asyncio
+    nest_asyncio.apply()  # seulement si nécessaire, souvent sur Jupyter ou environnements spécifiques
+
+    from telegram.ext import ApplicationBuilder
+    import asyncio
+
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    # Ajoute ici tes handlers, exactement comme dans main()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("add",add))
+    app.add_handler(CommandHandler("sub",sub))
+    app.add_handler(CommandHandler("mul",mul))
+    app.add_handler(CommandHandler("div",div))
+    app.add_handler(CommandHandler("mod",mod))
+    app.add_handler(CommandHandler("pin",pin))
+    app.add_handler(CommandHandler("gen_phrase",gen_phrase))
+    app.add_handler(CommandHandler("msg",msg))
+    app.add_handler(CommandHandler("send",send))
+    app.add_handler(CommandHandler("about",about))
+    app.add_handler(CommandHandler("listusers",listusers))
+    app.add_handler(CommandHandler("getid",getid))
+    app.add_handler(CommandHandler("time",time))
+    app.add_handler(CommandHandler("clear",clear))
+    app.add_handler(CommandHandler("ask",ask))
+    app.add_handler(CommandHandler("google",open_google))
+    app.add_handler(CommandHandler("play",play))
+    app.add_handler(CommandHandler("video",youtube_se))
+    app.add_handler(CommandHandler("meteo",meteo))
+    
+    # Lancement du bot
+    print("Machine_Bot a démarré...")
+    send_online(app.bot,"🤖 Le bot est en ligne ✅")    
+    
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
+    
+    app.run_polling()
 
    
 
