@@ -10,7 +10,7 @@ import requests
 import subprocess
 from googleapiclient.discovery import build
 from google.genai import types 
-from google import genai
+from google.generativeai import genai
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
 from telegram.ext import Updater,CommandHandler,MessageHandler,Filters
 
