@@ -734,7 +734,7 @@ async def main():
   
 if __name__ == "__main__":    
     import nest_asyncio
-    nest_asyncio.apply()  # seulement si nécessaire, souvent sur Jupyter ou environnements spécifiques
+    nest_asyncio.apply()  
 
     from telegram.ext import ApplicationBuilder
     import asyncio
@@ -765,9 +765,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("meteo",meteo))
     
     # Lancement du bot
-    print("Machine_Bot a démarré...")
-    send_online(app.bot,"🤖 Le bot est en ligne ✅")    
-    
+    print("Machine_Bot a démarré...")   
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
     app.run_polling()
