@@ -717,19 +717,8 @@ async def main():
    
     print("Machine_Bot a démarré...")
     
-    
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
-    async def handle_exit(sig,frame):
-        print("Arrêt du bot...")
-        asyncio.create_task(send_online(app.bot," 🤖 Le bot a été déconnecté par son proprietaire ❌"))
-        sys.exit(0)
-
-    #capter les signaux d’arrêt (CTRL+C, kill, systemd, etc.)
-
-    signal.signal(signal.SIGTERM,handle_exit)
-    signal.signal(signal.SIGTSTP,handle_exit)
-   
     await app.run_polling()
   
 if __name__ == "__main__":    
@@ -739,7 +728,7 @@ if __name__ == "__main__":
     from telegram.ext import ApplicationBuilder
     import asyncio
 
-    app = ApplicationBuilder().token(TOKEN).build()
+    app = ApplicationBuilder().token(TOKEN).post_init(send_online(app.bot,"🤖 Le bot est en ligne ✅")).build()
 
     # Ajoute ici tes handlers, exactement comme dans main()
     app.add_handler(CommandHandler("start", start))
