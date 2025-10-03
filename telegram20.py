@@ -739,7 +739,7 @@ if __name__ == "__main__":
     from telegram.ext import ApplicationBuilder
     import asyncio
 
-    app = ApplicationBuilder().token(TOKEN).build()
+    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
 
     # Ajoute ici tes handlers, exactement comme dans main()
     app.add_handler(CommandHandler("start", start))
