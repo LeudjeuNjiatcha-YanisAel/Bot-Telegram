@@ -65,6 +65,7 @@ Le bot sauvegarde automatiquement les **utilisateurs enregistrés** dans un fich
 * **Python 3**
 * **Telegram Bot API** (`python-telegram-bot`)
 * **OpenWeather API** (Météo)
+* **Youtube API** (Recherche Video)
 * **TimeZoneDB API** (Heure locale)
 * **Google Generative AI (Gemini)**
 * **yt-dlp** (Téléchargement audio)
@@ -74,7 +75,7 @@ Le bot sauvegarde automatiquement les **utilisateurs enregistrés** dans un fich
 
 ## 📂 Fichiers
 
-* `main.py` → Script principal du bot
+* `Bot-Telegram.py` → Script principal du bot
 * `users.json` → Sauvegarde des utilisateurs
 * `meteo.json` → Historique météo consulté
 * `music/` → Dossier contenant les musiques téléchargées
@@ -115,12 +116,13 @@ Remplacer les clés dans le script :
 TOKEN = "VOTRE_TOKEN_TELEGRAM"
 METEO_API = "VOTRE_CLE_METEO"
 KEY_TIME = "VOTRE_CLE_TIMEZONE"
+youtube_api = "VOTRE_CLE_YOUTUBE"
 ```
 
 ### 4. Lancer le bot
 
 ```bash
-python main.py
+python3 Bot-Telegram.py
 ```
 
 ---
