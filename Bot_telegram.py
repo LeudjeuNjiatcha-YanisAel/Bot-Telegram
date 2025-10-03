@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 import subprocess
 from googleapiclient.discovery import build
-from google.genai import types 
-from google.generativeai import genai
+from google import generativeai as genai
+from google.generativeai import types
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
 from telegram.ext import Updater,CommandHandler,MessageHandler,Filters
 
