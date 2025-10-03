@@ -380,11 +380,11 @@ async def clear(update,context):
             await update.message.reply_text("✅ 50 derniers messages supprimés")
         except:
             await update.message.reply_text("❌ Impossible de nettoyer (le bot doit être admin et avoir la permission de suppression)")
-async def send_online(bot,text):
+async def send_online(app):
     for chat_id in users.keys():
         try:
             print("Message envoye ! ✅")
-            await bot.send_message(chat_id=int(chat_id),text=text)
+            await app.bot.send_message(chat_id=int(chat_id),text="🤖 Le bot est en ligne ✅")
         except Exception as e:
             print(f"Erreur en envoyant à {chat_id}: {e}")
             
@@ -691,7 +691,7 @@ async def play(update,context):
         await update.message.reply_text(f"Erreur : {e}")        
 
 async def main():
-    app = ApplicationBuilder().token(TOKEN).post_init(send_online(app.bot,"🤖 Le bot est en ligne ✅")).build()
+    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
     
     app.add_handler(CommandHandler("start",start))
     app.add_handler(CommandHandler("help",help_command))
@@ -728,7 +728,7 @@ if __name__ == "__main__":
     from telegram.ext import ApplicationBuilder
     import asyncio
 
-    app = ApplicationBuilder().token(TOKEN).post_init(send_online(app.bot,"🤖 Le bot est en ligne ✅")).build()
+    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
 
     # Ajoute ici tes handlers, exactement comme dans main()
     app.add_handler(CommandHandler("start", start))
