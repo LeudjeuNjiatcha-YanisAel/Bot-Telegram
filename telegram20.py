@@ -715,8 +715,8 @@ async def main():
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("meteo",meteo))
    
-    print("Machine_Bot a démarré...")
-    await send_online(app.bot,"🤖 Le bot est en ligne ✅")    
+    print("Machine_Bot  démarré...")
+    asyncio.create_task(send_online(app.bot,"🤖 Le bot est en ligne ✅"))    
     
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
@@ -765,7 +765,8 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("meteo",meteo))
     
     # Lancement du bot
-    print("Machine_Bot a démarré...")   
+    print("Machine_Bot a démarré...")
+    asyncio.create_task(send_online(app.bot,"🤖 Le bot est en ligne ✅"))    
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
     app.run_polling()
