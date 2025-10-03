@@ -1,11 +1,11 @@
 import random
 from random import shuffle
 import datetime
+import asyncio
 import json
 import os
 import sys
 import signal
-from concurrent.futures import ThreaaddoolExecutor, as_completed
 import requests
 import subprocess
 from googleapiclient.discovery import build
@@ -50,7 +50,7 @@ async def start(update,context):
         "Voici ce que je peux faire pour toi :\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🧮 *Mathématiques*\n"
-        "➕ /add x y → Addition\n"
+        "➕ /app x y → Addition\n"
         "➖ /sub x y → Soustraction\n"
         "✖️ /mul x y → Multiplication\n"
         "➗ /div x y → Division\n"
@@ -110,7 +110,7 @@ async def help_command(update,context):
         "📖 *Aide - Machine_11bot* 📖\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🧮 *Mathématiques*\n"
-        "/add x y → Addition\n"
+        "/app x y → Addition\n"
         "/sub x y → Soustraction\n"
         "/mul x y → Multiplication\n"
         "/div x y → Division\n"
@@ -146,7 +146,7 @@ async def add(update,context):
         await update.message.reply_text(f"Résultat : {n1} + {n2} = {n1+n2}")
         print("La fonction addition a été utiliser avec succès!")
     except:
-        await update.message.reply_text("Usage : /add 'nombre1' 'nombre2'")
+        await update.message.reply_text("Usage : /app 'nombre1' 'nombre2'")
 
 async def sub(update,context):
     try:
@@ -265,15 +265,17 @@ async def ask(update,context):
         return
 
     try:
-        genai.configure(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
+        client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
 
-        response = genai.TextCompletion.create(
-            model="text-bison-001",
-            prompt=question,
-            temperature=0.7,
-            max_output_tokens=300
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=question
         )
-        await update.message.reply_text(f"💡 Réponse : {response.output_text}")
+
+        answer = response.text
+        for i in range(0,len(answer),4096) :
+            await update.message.reply_text("Machine_IA🤖 \n ")
+            await update.message.reply_text("💡 Réponse : "+answer[i:i+4096])
     except Exception as e:
         await update.message.reply_text(f"⚠️ Machine IA : {e}")
 
@@ -305,7 +307,7 @@ async def meteo(update, context):
     print(f"Le client {sender} a consulter les donnees meteo ")
     
     ville = " ".join(context.args) 
-    await update.message.reply_text(met(ville))
+    await update.message.reply_text(await met(ville))
 
 async def local_time(city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={METEO_API}"
@@ -333,7 +335,7 @@ async def time(update,context):
     print(f"Le client {sender} a consulter l'heure de sa ville")
     
     ville = " ".join(context.args)
-    await update.message.reply_text(local_time(ville))
+    await update.message.reply_text(await local_time(ville))
     
 async def listusers(update,context):
     if not users:
@@ -382,7 +384,7 @@ async def send_online(bot,text):
     for chat_id in users.keys():
         try:
             print("Message envoye ! ✅")
-            bot.send_message(chat_id=int(chat_id), text=text)
+            await bot.send_message(chat_id=int(chat_id), text=text)
         except Exception as e:
             print(f"Erreur en envoyant à {chat_id}: {e}")
             
@@ -413,7 +415,7 @@ async def auto_reply(update,context):
         if "en " in text or "a" in text:
             try:
                 ville = text.split("en", 1)[1].strip()
-                heure_ville = local_time(ville)
+                heure_ville = await local_time(ville)
                 reply = f"⏰ Il est actuellement {heure_ville} à {ville.title()}"
             except Exception as e:
                 reply = f"❌ Impossible de récupérer l'heure demandée ({e})"
@@ -454,13 +456,15 @@ async def auto_reply(update,context):
     else:
         try:
             client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
+
             response = client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 contents=text
             )
+
             answer = response.text
-            for i in range(0, len(answer), 1000):
-                await update.message.reply_text("🤖Machine_Bot🤖 : " + answer[i:i+1500])
+            for i in range(0,len(answer),1000) :
+                await update.message.reply_text("Machine_IA🤖 : "+answer[i:i+4096])
         except Exception as e:
             print(f"Erreur API Gemini : {e}")
             await update.message.reply_text("⚠️ Impossible de causer avec le bot pour le moment, réessaie plus tard.")
@@ -605,7 +609,7 @@ async def youtube_se(update,context):
         return 
     
     name = " ".join(context.args)      
-    (video_id,title,likes,vues),(playlist_id,playlist_title) = search_video(name)
+    (video_id,title,likes,vues),(playlist_id,playlist_title) = await search_video(name)
 
     # Partie vidéo
     await update.message.reply_text(f"\n\tVideo trouvee : {title} ✅")
@@ -615,8 +619,8 @@ async def youtube_se(update,context):
     await update.message.reply_text("Analyses des commentaires des differentes video ...")
 
     # Récupération des commentaires
-    comment = commentaries(video_id)
-    recommandation = analyse_comments(comment)
+    comment = await commentaries(video_id)
+    recommandation = await analyse_comments(comment)
 
     await update.message.reply_text("Meilleur Commentaire Trouvee ")
     await update.message.reply_text(f"{len(comment)} commentaires recuperes.")
@@ -630,10 +634,10 @@ async def youtube_se(update,context):
     await update.message.reply_text(f"-URL de la playlist : https://www.youtube.com/playlist?list={playlist_id}")
     print("Playlist Afficher Avec Succes ✅")
 
-    total = info_playlist(playlist_id)
+    total = await info_playlist(playlist_id)
     await update.message.reply_text(f" 📺Nombre De Video De La Playlist {total} videos")
     await update.message.reply_text("\n=== Recommandation de la Playlist ===")
-    analyse = analyse_playlist(playlist_id, playlist_title)
+    analyse = await analyse_playlist(playlist_id, playlist_title)
     await update.message.reply_text(analyse)
 
     
@@ -681,7 +685,7 @@ async def play(update,context):
         latest_file = os.path.join(MUSIC,files[-1])
         
         with open(latest_file,"rb") as audio:
-            update.message.reply_audio(audio)
+            await update.message.reply_audio(audio)
         await update.message.reply_text("Voici ta musique !")
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
@@ -689,41 +693,47 @@ async def play(update,context):
 async def main():
     app = ApplicationBuilder().token(TOKEN).build()
     
-    add.add_handler(CommandHandler("start",start))
-    add.add_handler(CommandHandler("help",help_command))
-    add.add_handler(CommandHandler("add",add))
-    add.add_handler(CommandHandler("sub",sub))
-    add.add_handler(CommandHandler("mul",mul))
-    add.add_handler(CommandHandler("div",div))
-    add.add_handler(CommandHandler("mod",mod))
-    add.add_handler(CommandHandler("pin",pin))
-    add.add_handler(CommandHandler("gen_phrase",gen_phrase))
-    add.add_handler(CommandHandler("msg",msg))
-    add.add_handler(CommandHandler("send",send))
-    add.add_handler(CommandHandler("about",about))
-    add.add_handler(CommandHandler("listusers",listusers))
-    add.add_handler(CommandHandler("getid",getid))
-    add.add_handler(CommandHandler("time",time))
-    add.add_handler(CommandHandler("clear",clear))
-    add.add_handler(CommandHandler("ask",ask))
-    add.add_handler(CommandHandler("google",open_google))
-    add.add_handler(CommandHandler("play",play))
-    add.add_handler(CommandHandler("video",youtube_se))
-    add.add_handler(CommandHandler("meteo",meteo))
+    app.add_handler(CommandHandler("start",start))
+    app.add_handler(CommandHandler("help",help_command))
+    app.add_handler(CommandHandler("add",add))
+    app.add_handler(CommandHandler("sub",sub))
+    app.add_handler(CommandHandler("mul",mul))
+    app.add_handler(CommandHandler("div",div))
+    app.add_handler(CommandHandler("mod",mod))
+    app.add_handler(CommandHandler("pin",pin))
+    app.add_handler(CommandHandler("gen_phrase",gen_phrase))
+    app.add_handler(CommandHandler("msg",msg))
+    app.add_handler(CommandHandler("send",send))
+    app.add_handler(CommandHandler("about",about))
+    app.add_handler(CommandHandler("listusers",listusers))
+    app.add_handler(CommandHandler("getid",getid))
+    app.add_handler(CommandHandler("time",time))
+    app.add_handler(CommandHandler("clear",clear))
+    app.add_handler(CommandHandler("ask",ask))
+    app.add_handler(CommandHandler("google",open_google))
+    app.add_handler(CommandHandler("play",play))
+    app.add_handler(CommandHandler("video",youtube_se))
+    app.add_handler(CommandHandler("meteo",meteo))
    
     print("Machine_Bot a démarré...")
-    send_online(updater.bot,"🤖 Le bot est en ligne ✅")    
-    add.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
+    await send_online(app.bot,"🤖 Le bot est en ligne ✅")    
+    
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
+    
     async def handle_exit(sig,frame):
         print("Arrêt du bot...")
-        send_online(updater.bot," 🤖 Le bot a été déconnecté par son proprietaire ❌")
+        asyncio.create_task(send_online(app.bot," 🤖 Le bot a été déconnecté par son proprietaire ❌"))
         sys.exit(0)
 
     #capter les signaux d’arrêt (CTRL+C, kill, systemd, etc.)
 
-    signal.signal(signal.SIGTERM, handle_exit)
-    signal.signal(signal.SIGTSTP, handle_exit)
+    signal.signal(signal.SIGTERM,handle_exit)
+    signal.signal(signal.SIGTSTP,handle_exit)
    
-    app.run_polling()
+    await app.run_polling()
   
-main()
+if __name__ == "__main__":    
+    asyncio.run(main())
+
+   
+
