@@ -273,9 +273,9 @@ async def ask(update,context):
         )
 
         answer = response.text
-        for i in range(0,len(answer),4096) :
+        for i in range(0,len(answer),1000) :
             await update.message.reply_text("Machine_IA🤖 \n ")
-            await update.message.reply_text("💡 Réponse : "+answer[i:i+4096])
+            await update.message.reply_text("💡 Réponse : "+answer[i:i+2000])
     except Exception as e:
         await update.message.reply_text(f"⚠️ Machine IA : {e}")
 
@@ -384,7 +384,7 @@ async def send_online(bot,text):
     for chat_id in users.keys():
         try:
             print("Message envoye ! ✅")
-            await bot.send_message(chat_id=int(chat_id), text=text)
+            await bot.send_message(chat_id=int(chat_id),text=text)
         except Exception as e:
             print(f"Erreur en envoyant à {chat_id}: {e}")
             
@@ -766,7 +766,6 @@ if __name__ == "__main__":
     
     # Lancement du bot
     print("Machine_Bot a démarré...")
-    send_online(app.bot,"🤖 Le bot est en ligne ✅")   
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
     app.run_polling()
