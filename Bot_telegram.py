@@ -5,18 +5,22 @@ import json
 import os
 import sys
 import signal
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 import subprocess
+from googleapiclient.discovery import build
+from google.genai import types 
 from google import genai
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
 from telegram.ext import Updater,CommandHandler,MessageHandler,Filters
 
-TOKEN = "Votre_Token"
+TOKEN = "8404081837:AAF9lT_adIUY8ou8LPfdUDXNqqE6DDe86K0"
 USERS_FILE = "users.json"
-METEO_API  = "Token_Meteo"
-KEY_TIME = "Token_Time"
+METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
+KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
-
+youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
+youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
 jeux_en_cours1 = {}
 if os.path.exists(USERS_FILE):
@@ -196,7 +200,6 @@ def gen_phrase(update,context):
     shuffle(mots)
     phrase = ' '.join(mots).capitalize() + '.'
     update.message.reply_text("Voici une phrase :")
-
     update.message.reply_text(phrase)
 
 def pin(update,context):
@@ -259,7 +262,7 @@ def ask(update,context):
         return
 
     try:
-        client = genai.Client(api_key="Cle Gemini AI Studio")
+        client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
 
         response = client.models.generate_content(
             model="gemini-2.0-flash",
@@ -376,7 +379,7 @@ def clear(update,context):
 def send_online(bot,text):
     for chat_id in users.keys():
         try:
-            print("Message envoye !")
+            print("Message envoye ! ✅")
             bot.send_message(chat_id=int(chat_id), text=text)
         except Exception as e:
             print(f"Erreur en envoyant à {chat_id}: {e}")
@@ -460,7 +463,178 @@ def auto_reply(update,context):
             print(f"Erreur API Gemini : {e}")
             update.message.reply_text("⚠️ Impossible de causer avec le bot pour le moment, réessaie plus tard.")
 
+def search_video(name):
+   requests = youtube.search().list(q = name,part="snippet",type="video",maxResults=1)
+   # Ici on veut trouver l'ID d'une video via son nom
+   response = requests.execute()
+   # Ici on envoie une requete et on obtient une reponse
+   
+   if response["items"]:
+       video = response["items"][0]["id"]["videoId"]
+       # Ca recupere l'id de la video
+       title = response["items"][0]["snippet"]["title"]
+       stats = youtube.videos().list(part="statistics",id=video)
+       stats_res = stats.execute()
+       stats = stats_res["items"][0]["statistics"]
+       like_count = stats.get("likeCount", "N/A")
+       vues = stats.get("viewCount", "N/A")
+       
+       # recherche playlist
+       req_playlist = youtube.search().list(q=name, part="snippet", type="playlist", maxResults=1)
+       res_playlist = req_playlist.execute()
+       playlist_id, playlist_title = (None, None)
+       if res_playlist["items"]:
+            playlist_id = res_playlist["items"][0]["id"]["playlistId"]
+            playlist_title = res_playlist["items"][0]["snippet"]["title"]
+       return (video,title,like_count,vues),(playlist_id,playlist_title)
+   return None,None,None,None
 
+
+# Pour recuperer le nombre de video d'une playlist
+def info_playlist(playlist_id):
+    request = youtube.playlistItems().list(part="snippet",playlistId=playlist_id,maxResults=50)
+    
+    response = request.execute()
+    total_videos = response.get("pageInfo",{}).get("totalResults",0)
+    return total_videos
+
+# Code Pour Les Commentaires
+def commentaries(video_id,max_results=10):
+    comments = []
+    requests = youtube.commentThreads().list(part = "snippet",videoId=video_id,textFormat="plainText",maxResults=max_results)
+    # On a construit la requete pour recuperer les commentaires
+    response = requests.execute()
+    # Lancement de la requete
+    for commentary in response["items"]:
+        pet = commentary["snippet"]["topLevelComment"]["snippet"]
+        #Ca va chercher le vrai commentaire
+        text = pet["textDisplay"]
+        #Recupere le texte du commentaire
+        like = pet["likeCount"]
+        comments.append((text,like))
+    return comments
+
+# Code Pour Analyser une Playlist
+def analyse_playlist(playlist_id,playlist_title):
+    videos = []
+    req = youtube.playlistItems().list(part="snippet",playlistId=playlist_id,maxResults=20)
+    res = req.execute()
+
+    for item in res.get("items", []):
+        title = item["snippet"]["title"]
+        videos.append(title)
+
+    if not videos:
+        return "Impossible d’analyser : la playlist est vide."
+
+    input_text = "\n".join([f"- {t}" for t in videos])
+
+    prompt = f"""Voici les titres des vidéos de la playlist "{playlist_title}" :
+    {input_text}
+    Analyse cette playlist et réponds :
+    1. Résume en quelques phrases ce que couvre cette playlist.
+    2. Pour quel type de spectateurs est-elle adaptée ?
+    3. Donne une note de pertinence /10.
+    4. Dis si tu la recommanderais, et pourquoi.
+    """
+
+    client = genai.Client(api_key="AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ")
+    model = "gemini-2.5-flash"
+
+    contents = [
+        types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=prompt)],
+        )
+    ]
+
+    config = types.GenerateContentConfig(response_modalities=["TEXT"])
+
+    output = ""
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=config,
+    ):
+        if getattr(chunk, "text", None):
+            output += chunk.text
+
+    return output.strip()
+
+# Code Recuperer Dans Google AI studio
+def analyse_comments(comments):
+    client = genai.Client(api_key=("AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ"))
+    # Ici on prend les commentaires les plus likes
+    input_text = "\n".join(
+        [f"- {txt} ({likes} likes)" for txt,likes in sorted(comments,key=lambda x:x[1],reverse=True)[:5]]
+    )
+
+    prompt = f"""Voici des commentaires d'une vidéo récupérés sur YouTube : {input_text}
+    Analyse ces commentaires et dit moi ci en 1 la video est pertinente , en 2 pour quelle type de spectatuers c'est reserver , en 3 tu donne une note /10 pour la pertinence , 
+    en 4 tu donne une raison pour laquelle tu recommanderait cette video
+    ."""
+
+    model = "gemini-2.5-flash"
+
+    contents = [
+        types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=prompt)],
+        )
+    ]
+
+    config = types.GenerateContentConfig(response_modalities=["TEXT"])
+
+    output = ""
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=config,
+    ):
+        if getattr(chunk, "text", None):
+            output += chunk.text
+
+    return output.strip()
+
+
+def youtube_se(update,context):
+    if not context.args :
+        update.message.reply_text("Utilisation correcte /video <nom de la video a rechercher>")
+        return 
+    
+    name = " ".join(context.args)      
+    (video_id,title,likes,vues),(playlist_id,playlist_title) = search_video(name)
+
+    # Partie vidéo
+    update.message.reply_text(f"\n\tVideo trouvee : {title} ✅")
+    update.message.reply_text(f"lien ▶️: https://www.youtube.com/watch?v={video_id}")
+    update.message.reply_text(f"Nombres De Likes 👍 : {likes} | 👁️ Vues : {vues} ")
+    print("Video Afficher Avec Succes ✅")
+    update.message.reply_text("Analyses des commentaires des differentes video ...")
+
+    # Récupération des commentaires
+    comment = commentaries(video_id)
+    recommandation = analyse_comments(comment)
+
+    update.message.reply_text("Meilleur Commentaire Trouvee ")
+    update.message.reply_text(f"{len(comment)} commentaires recuperes.")
+    update.message.reply_text("\n=== Video recommandee a partir des commentaires ===")
+    update.message.reply_text(recommandation)
+    print("Recommandation Afficher Avec Succes ✅")
+    update.message.reply_text("\n")
+
+    # Partie playlist
+    update.message.reply_text(f"\n\t=== 📂 Meilleure Playlist Trouvée Pour {name} : {playlist_title} ===")
+    update.message.reply_text(f"-URL de la playlist : https://www.youtube.com/playlist?list={playlist_id}")
+    print("Playlist Afficher Avec Succes ✅")
+
+    total = info_playlist(playlist_id)
+    update.message.reply_text(f" 📺Nombre De Video De La Playlist {total} videos")
+    update.message.reply_text("\n=== Recommandation de la Playlist ===")
+    analyse = analyse_playlist(playlist_id, playlist_title)
+    update.message.reply_text(analyse)
+
+    
 def play(update,context):
     if not context.args:
         update.message.reply_text("Utilisation de la commande : /play <nom de la musique>")
@@ -533,6 +707,7 @@ def main():
     dp.add_handler(CommandHandler("ask",ask))
     dp.add_handler(CommandHandler("google",open_google))
     dp.add_handler(CommandHandler("play",play))
+    dp.add_handler(CommandHandler("video",youtube_se))
     dp.add_handler(CommandHandler("meteo",meteo))
    
     print("Machine_Bot a démarré...")
