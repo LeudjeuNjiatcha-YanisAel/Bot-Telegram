@@ -515,9 +515,9 @@ def commentaries(video_id,max_results=10):
     return comments
 
 # Code Pour Analyser une Playlist
-def analyse_playlist(playlist_id,playlist_title):
+def analyse_playlist(playlist_id, playlist_title, youtube):
     videos = []
-    req = youtube.playlistItems().list(part="snippet",playlistId=playlist_id,maxResults=20)
+    req = youtube.playlistItems().list(part="snippet", playlistId=playlist_id, maxResults=20)
     res = req.execute()
 
     for item in res.get("items", []):
@@ -538,64 +538,33 @@ def analyse_playlist(playlist_id,playlist_title):
     4. Dis si tu la recommanderais, et pourquoi.
     """
 
-    client = genai.Client(api_key="AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ")
-    model = "gemini-2.5-flash"
+    genai.configure(api_key=os.environ.get("AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ"))
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(prompt)
 
-    contents = [
-        types.Content(
-            role="user",
-            parts=[types.Part.from_text(text=prompt)],
-        )
-    ]
+    return response.text.strip()
 
-    config = types.GenerateContentConfig(response_modalities=["TEXT"])
-
-    output = ""
-    for chunk in client.models.generate_content_stream(
-        model=model,
-        contents=contents,
-        config=config,
-    ):
-        if getattr(chunk, "text", None):
-            output += chunk.text
-
-    return output.strip()
 
 # Code Recuperer Dans Google AI studio
 def analyse_comments(comments):
-    client = genai.Client(api_key=("AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ"))
-    # Ici on prend les commentaires les plus likes
+    # On prend les 5 commentaires les plus likés
     input_text = "\n".join(
-        [f"- {txt} ({likes} likes)" for txt,likes in sorted(comments,key=lambda x:x[1],reverse=True)[:5]]
+        [f"- {txt} ({likes} likes)" for txt, likes in sorted(comments, key=lambda x: x[1], reverse=True)[:5]]
     )
 
     prompt = f"""Voici des commentaires d'une vidéo récupérés sur YouTube : {input_text}
-    Analyse ces commentaires et dit moi ci en 1 la video est pertinente , en 2 pour quelle type de spectatuers c'est reserver , en 3 tu donne une note /10 pour la pertinence , 
-    en 4 tu donne une raison pour laquelle tu recommanderait cette video
-    ."""
+    Analyse ces commentaires et réponds :
+    1. La vidéo est-elle pertinente ?
+    2. Pour quel type de spectateurs est-elle réservée ?
+    3. Donne une note /10 pour la pertinence.
+    4. Explique en une phrase si tu la recommanderais, et pourquoi.
+    """
 
-    model = "gemini-2.5-flash"
+    genai.configure(api_key=os.environ.get("AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ"))
+    model = genai.GenerativeModel("gemini-2.5-pro")
+    response = model.generate_content(prompt)
 
-    contents = [
-        types.Content(
-            role="user",
-            parts=[types.Part.from_text(text=prompt)],
-        )
-    ]
-
-    config = types.GenerateContentConfig(response_modalities=["TEXT"])
-
-    output = ""
-    for chunk in client.models.generate_content_stream(
-        model=model,
-        contents=contents,
-        config=config,
-    ):
-        if getattr(chunk, "text", None):
-            output += chunk.text
-
-    return output.strip()
-
+    return response.text.strip()
 
 def youtube_se(update,context):
     if not context.args :
