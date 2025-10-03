@@ -691,7 +691,7 @@ async def play(update,context):
         await update.message.reply_text(f"Erreur : {e}")        
 
 async def main():
-    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
+    app = ApplicationBuilder().token(TOKEN).post_init(send_online(app.bot,"🤖 Le bot est en ligne ✅")).build()
     
     app.add_handler(CommandHandler("start",start))
     app.add_handler(CommandHandler("help",help_command))
@@ -716,7 +716,7 @@ async def main():
     app.add_handler(CommandHandler("meteo",meteo))
    
     print("Machine_Bot a démarré...")
-    await send_online(app.bot,"🤖 Le bot est en ligne ✅")    
+    
     
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
@@ -739,7 +739,7 @@ if __name__ == "__main__":
     from telegram.ext import ApplicationBuilder
     import asyncio
 
-    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
+    app = ApplicationBuilder().token(TOKEN).build()
 
     # Ajoute ici tes handlers, exactement comme dans main()
     app.add_handler(CommandHandler("start", start))
