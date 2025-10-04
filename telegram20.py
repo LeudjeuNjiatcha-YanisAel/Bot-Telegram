@@ -369,15 +369,6 @@ async def getid(update,context):
     await update.message.reply_text(f"Ton chat_id est : {chat_id}")
 
 async def clear(update,context):
-    chat = update.message.chat
-    chat_id = chat.id
-    message_id = update.message.message_id
-
-    if chat.type == "private":
-        empty_block = "\n\n".join(["\u200E" for _ in range(50)])
-        await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
-        return
-
     chat = update.effective_chat
     bot_member = await chat.get_member(context.bot.id)
 
@@ -391,7 +382,7 @@ async def clear(update,context):
         # On récupère les 50 derniers messages
         async for message in context.bot.get_chat(chat.id).iter_history(limit=50):
             try:
-                await context.bot.delete_message(chat_id=chat.id,message_id=message.message_id)
+                await context.bot.delete_message(chat_id=chat.id, message_id=message.message_id)
                 count += 1
             except:
                 pass  # Certains messages ne peuvent pas être supprimés (par ex. messages système)
