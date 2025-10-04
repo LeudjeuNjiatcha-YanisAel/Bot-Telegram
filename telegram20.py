@@ -380,7 +380,7 @@ async def clear(update,context):
 
     if chat.type in ["group","supergroup"]:
         try:
-            for i in range(message_id,message_id-100,-1):
+            for i in range(message_id,message_id-700,-1):
                 try:
                    await context.bot.delete_message(chat_id=chat_id,message_id=i)
                 except:
