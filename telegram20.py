@@ -766,7 +766,7 @@ async def football(update,context):
     
     url = f"https://v3.football.api-sports.io/fixtures"
     headers = {"x-apisports-key":FOOTBALL}
-    params = {"league": league_id, "season": 2025, "next": 5}
+    params = {"league": league_id, "season": 2023, "next": 5}
     
     response = requests.get(url,headers=headers,params=params)
     data = response.json()
