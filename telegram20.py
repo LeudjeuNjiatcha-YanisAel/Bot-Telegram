@@ -369,29 +369,25 @@ async def getid(update,context):
     await update.message.reply_text(f"Ton chat_id est : {chat_id}")
 
 async def clear(update,context):
-    chat = update.effective_chat
-    bot_member = await chat.get_member(context.bot.id)
+    chat = update.message.chat
+    chat_id = chat.id
+    message_id = update.message.message_id
 
-    # Vérifie si le bot est admin et peut supprimer
-    if not bot_member.can_delete_messages:
-        await update.message.reply_text("❌ Je n'ai pas la permission de supprimer des messages ici !")
+    if chat.type == "private":
+        empty_block = "\n\n".join(["\u200E" for _ in range(50)])
+        await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
 
-    try:
-        # Récupérer les 50 derniers messages
-        messages = await context.bot.get_chat_history(chat_id=chat.id, limit=50)
-
-        count = 0
-        for message in messages:
-            try:
-                await context.bot.delete_message(chat_id=chat.id, message_id=message.message_id)
-                count += 1
-            except:
-                pass  # Ignore si certains messages ne peuvent pas être supprimés
-
-        await update.message.reply_text(f"✅ {count} derniers messages supprimés !")
-    except Exception as e:
-        await update.message.reply_text(f"❌ Erreur : {e}")
+    if chat.type in ["group","supergroup"]:
+        try:
+            for i in range(message_id,message_id-50,-1):
+                try:
+                   await context.bot.delete_message(chat_id=chat_id,message_id=i)
+                except:
+                    pass
+            await update.message.reply_text("✅ 50 derniers messages supprimés")
+        except:
+            await update.message.reply_text("❌ Impossible de nettoyer (le bot doit être admin et avoir la permission de suppression)")
 
 async def send_online(app):
     for chat_id in users.keys():
