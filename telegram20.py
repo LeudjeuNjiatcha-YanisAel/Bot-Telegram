@@ -777,33 +777,22 @@ async def news(update,context):
     print("✅ News avec résumés affichées !")
 
 async def pp(update,context):
-    if context.args:
-        try:
-            user_id = int(context.args[0])
-        except ValueError:
-            await update.message.reply_text("❌ Donne un ID utilisateur valide.")
-            return
-
-    # Cas 2 : réponse à un message
-    elif update.message.reply_to_message:
+    # Reponses a un message
+    if update.message.reply_to_message:
         user_id = update.message.reply_to_message.from_user.id
-
-    # Cas 3 : aucune info → prendre l’utilisateur qui envoie la commande
     else:
         user_id = update.message.from_user.id
-
-    # Récupération des photos de profil
     photos = await context.bot.get_user_profile_photos(user_id)
-
+    
     if photos.total_count == 0:
         await update.message.reply_text("❌ Cet utilisateur n’a pas de photo de profil.")
         return
-
     # Prendre la plus récente (dernier élément de la liste)
     photo_file_id = photos.photos[0][-1].file_id
 
     # Envoyer la photo au chat
-    await update.message.reply_photo(photo_file_id, caption="📸 Photo de profil récupérée ✅")
+    await update.message.reply_photo(photo_file_id,caption="📸 Photo de profil récupérée ✅")   
+
 async def football(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation : /football <nom du championnat>")
