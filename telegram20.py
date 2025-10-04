@@ -18,11 +18,11 @@ USERS_FILE = "users.json"
 METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
 KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
+FOOTBALL = "A2OwCG4H2Hq5t0fAG0stROYqwwr1kx8qgN3akj1IUKZ5PotxHkZwUTQry5u7"
 NEWS = "a3f9296a48a446e8b0f3626481922e3a"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
-jeux_en_cours1 = {}
 
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
@@ -388,6 +388,7 @@ async def clear(update,context):
             await update.message.reply_text("✅ 50 derniers messages supprimés")
         except:
             await update.message.reply_text("❌ Impossible de nettoyer (le bot doit être admin et avoir la permission de suppression)")
+
 async def send_online(app):
     for chat_id in users.keys():
         try:
@@ -419,6 +420,7 @@ async def auto_reply(update,context):
         reply = "Avec plaisir 😎"
         await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "heure" in text:
+        
         # Vérifier si l’utilisateur a demandé l’heure dans une ville spécifique
         if "en " in text or "a " in text or "au " in text:
             try:
@@ -713,9 +715,9 @@ def call_news(category="general",country="fr",max_results=5):
     url = "https://newsapi.org/v2/top-headlines"
     params = {
         "apiKey":NEWS,
-        "category": category,
-        "country": country,
-        "pageSize": max_results
+        "category":category,
+        "country":country,
+        "pageSize":max_results
     }
 
     response = requests.get(url,params=params)
@@ -735,7 +737,55 @@ async def news(update,context):
     list = call_news("technology","fr",5)
     for title,url in list:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
+    print("Informations des news afficher avec succes ! ✅")
 
+
+async def football(update,context):
+    if not context.args:
+        await update.message.reply_text("Utilisation : /football <nom du championnat>")
+        return
+    
+    league_name = " ".join(context.args).lower()
+    league_id = None
+    leagues = {
+        "premier league":39,
+        "la liga":140,
+        "serie a":135,
+        "bundesliga":78,
+        "ligue 1":61
+    }
+    
+    for name, id in leagues.items():
+        if league_name in name:
+            league_id = id
+            break
+    
+    if not league_id:
+        await update.message.reply_text("Championat non reconnu. Exemples : Premier League, La Liga, Serie A, Bundesliga, Ligue 1")
+        return
+    
+    url = f"https://v3.football.api-sports.io/fixtures"
+    headers = {"x-apisports-key":FOOTBALL}
+    params = {"league": league_id, "season": 2025, "next": 5}
+    
+    response = requests.get(url,headers=headers,params=params)
+    data = response.json()
+    
+    if data.get("results") == 0:
+        await update.message.reply_text("Aucun match trouvé pour ce championnat.")
+        return
+    
+    fixtures = data.get("response", [])
+    message = f"📅 Prochains matchs de {league_name.title()}:\n\n"
+    
+    for fixture in fixtures:
+        teams = fixture["teams"]
+        date = fixture["fixture"]["date"]
+        venue = fixture["fixture"]["venue"]["name"]
+        message += f"{teams['home']['name']} vs {teams['away']['name']}\nDate: {date}\nLieu: {venue}\n\n"
+    
+    await update.message.reply_text(message)
+    
 async def main():
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
     
@@ -800,6 +850,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
+    app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("meteo",meteo))
     
