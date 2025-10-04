@@ -6,3 +6,4 @@ nest-asyncio
 yt-dlp
 ffmpeg-python
 gnews
+pillow

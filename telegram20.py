@@ -5,6 +5,8 @@ import asyncio
 import json
 import os
 from gnews import GNews
+from PIL import Image
+from io import BytesIO
 import tempfile
 import requests
 import subprocess
@@ -793,6 +795,32 @@ async def pp(update,context):
     # Envoyer la photo au chat
     await update.message.reply_photo(photo_file_id,caption="📸 Photo de profil récupérée ✅")   
 
+async def sticker(update,context):
+    if not update.message.reply_text_to_message or not update.message.reply_to_message.photo:
+        await update.message.reply_text("❌ Réponds à une photo  avec /sticke.")
+        return
+    
+    # Recuperation de la photo
+    photo_file = await update.message.reply_to_message.photo[-1].get_file()
+    photo_bytes = BytesIO()
+    await photo_file.download_to_memory(out=photo_bytes)
+    photo_bytes.seek(0)
+    
+    # Creation du sticker
+    image = Image.open(photo_bytes)
+    # Redimensionner l'image
+    max_size = 512
+    image.thumbnail((max_size, max_size))
+    
+    # Sauvegarde dans un buffer
+    output = BytesIO()
+    output.name = "sticker.png"
+    image.save(output, format="PNG")
+    output.seek(0)
+    
+    #envoie du sticker
+    await update.message.reply_sticker(sticker=output)
+    
 async def football(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation : /football <nom du championnat>")
