@@ -796,8 +796,8 @@ async def pp(update,context):
     await update.message.reply_photo(photo_file_id,caption="📸 Photo de profil récupérée ✅")   
 
 async def sticker(update,context):
-    if not update.message.reply_text_to_message or not update.message.reply_to_message.photo:
-        await update.message.reply_text("❌ Réponds à une photo  avec /sticke.")
+    if not update.message.reply_to_message or not update.message.reply_to_message.photo:
+        await update.message.reply_text("❌ Réponds à une photo  avec /sticker.")
         return
     
     # Recuperation de la photo
@@ -815,7 +815,7 @@ async def sticker(update,context):
     # Sauvegarde dans un buffer
     output = BytesIO()
     output.name = "sticker.png"
-    image.save(output, format="PNG")
+    image.save(output,format="PNG")
     output.seek(0)
     
     #envoie du sticker
