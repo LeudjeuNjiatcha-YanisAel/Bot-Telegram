@@ -34,6 +34,9 @@ def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
+async def ping(update,context):
+    await update.message.reply_text("Pong! 🤖 MachineBot est en ligne ✅")
+
 async def start(update,context):
     user = update.message.from_user
     users[str(user.id)] = {
@@ -75,7 +78,8 @@ async def start(update,context):
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
         "❓ /help → Voir toutes les commandes\n"
-        "   /about → Infos sur le bot-telegram\n\n"
+        "🎾️ /ping → Verifie si le bot est en ligne\n"
+        "🎏 /about → Infos sur le bot-telegram\n\n"
         "_Mentionne-moi avec @NomDuBot dans un groupe pour discuter avec moi ! 🤖")
     keyboard = [
         [InlineKeyboardButton("📖 Voir l'aide", callback_data="help")],
@@ -92,18 +96,18 @@ async def about(update,context):
         "✨ *Version* : `20.6`\n"
         "💫 *Technologies* :\n"
         "   🥇 Python\n"
-        "   🥈 VPS (Serveurs Linux)\n\n"
+        "   🥈 VPS (Serveurs)\n\n"
         "👨‍💻 *Concepteur* : *Machine*\n"
         "📱 *Contact* : [WhatsApp](https://wa.me/237620834784)\n\n"
         "🎁 *Lien du bot* : [Clique ici](https://t.me/Machine_11bot)\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
-        "⚡️ Multi-fonctions : Maths, Musique, Météo, Jeux, IA\n"
+        "⚡️ Multi-fonctions : Maths, Musique, Météo,Youtube, IA\n"
         "━━━━━━━━━━━━━━━━━━━━━━━"
     )
     keyboard = [
         [InlineKeyboardButton("📖 Aide",callback_data="help_command")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(text, parse_mode="Markdown", reply_markup=reply_markup)
+    await update.message.reply_text(text,parse_mode="Markdown",reply_markup=reply_markup)
 
 async def help_command(update,context):
     await update.message.reply_text(
@@ -134,6 +138,7 @@ async def help_command(update,context):
         "/ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
+        "/ping → Verifie si le bot est en ligne\n"
         "/help → Afficher cette aide\n"
         "/about → Informations sur le bot\n"
         "Mentionne-moi avec @NomDuBot dans un groupe pour discuter avec moi ! 🤖"
@@ -400,16 +405,16 @@ async def auto_reply(update,context):
     
     if "bonjour" in text or "salut" in text or "bjr" in text or "yo" in text:
         reply = "Salut 👋 comment tu vas ?"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " + reply)
+        await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "ça va" in text:
         reply = "Oui ça va très bien merci 🤖 et toi ?"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " + reply)
+        await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "bien" in text:
         reply = "Idem de mon cote"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " + reply)
+        await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "merci" in text:
         reply = "Avec plaisir 😎"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " + reply)
+        await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "heure" in text:
         # Vérifier si l’utilisateur a demandé l’heure dans une ville spécifique
         if "en " in text or "a" in text:
@@ -423,36 +428,39 @@ async def auto_reply(update,context):
         else:
             now = datetime.datetime.now()
             reply = f"⏰ Il est actuellement {now.strftime('%H:%M:%S')} au Cameroun"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "imbécile" in text:
         reply = "Et toi tu es idiot"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "ton nom" in text or "qui est tu" in text:
         reply = "Je suis ton bot multifonctions 🤖 créé par Machine 😎"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "idiot" in text or "fou" in text or "tu es bete" in text:
         reply = "Va te faire foutre🖕️"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "mouf" in text:
         reply = "Sale Gros con "
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "con" in text:
         reply = "Espece de feignant"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "ta maman" in text :
         reply = "Ca ne m'atteint pas "
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "acer" in text or "asser" in text:
         reply = "Que veux tu faire aujourd'hui"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "enfoirés" in text:
         reply = "Ignorant"
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif "ton cu" in text:
         reply = "Stupide que tu es "
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
         reply = "Encule 🖕️ "
-        await update.message.reply_text("🤖Machine_Bot🤖 : " +reply)
+        await update.message.reply_text("Machine_Bot🤖 : " +reply)
+    elif  "aide" in text or "help" in text:
+        reply = await help_command()
+        await update.message.reply_text("Machine_Bot🤖 \n" +reply)
     else:
         try:
             client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
@@ -463,7 +471,7 @@ async def auto_reply(update,context):
             )
 
             answer = response.text
-            for i in range(0,len(answer),1000) :
+            for i in range(0,len(answer),2000) :
                 await update.message.reply_text("Machine_IA🤖 : "+answer[i:i+4096])
         except Exception as e:
             print(f"Erreur API Gemini : {e}")
@@ -545,7 +553,7 @@ async def analyse_playlist(playlist_id,playlist_title):
     """
 
     client = genai.Client(api_key="AIzaSyAQBpi-rDqpY4rqSZbeFc0Szjg0dsCYixQ")
-    model = "gemini-2.5-flash"
+    model = "gemini-2.5-pro"
 
     contents = [
         types.Content(
@@ -580,7 +588,7 @@ async def analyse_comments(comments):
     en 4 tu donne une raison pour laquelle tu recommanderait cette video
     ."""
 
-    model = "gemini-2.5-flash"
+    model = "gemini-2.5-pro"
 
     contents = [
         types.Content(
@@ -597,7 +605,7 @@ async def analyse_comments(comments):
         contents=contents,
         config=config,
     ):
-        if getattr(chunk, "text", None):
+        if getattr(chunk,"text",None):
             output += chunk.text
 
     return output.strip()
@@ -613,7 +621,7 @@ async def youtube_se(update,context):
 
     # Partie vidéo
     await update.message.reply_text(f"\n\tVideo trouvee : {title} ✅")
-    await update.message.reply_text(f"lien ▶️: https://www.youtube.com/watch?v={video_id}")
+    await update.message.reply_text(f"lien ▶️ : https://www.youtube.com/watch?v={video_id}")
     await update.message.reply_text(f"Nombres De Likes 👍 : {likes} | 👁️ Vues : {vues} ")
     print("Video Afficher Avec Succes ✅")
     await update.message.reply_text("Analyses des commentaires des differentes video ...")
@@ -635,7 +643,7 @@ async def youtube_se(update,context):
     print("Playlist Afficher Avec Succes ✅")
 
     total = await info_playlist(playlist_id)
-    await update.message.reply_text(f" 📺Nombre De Video De La Playlist {total} videos")
+    await update.message.reply_text(f" 📺 Nombre De Video De La Playlist {total} videos")
     await update.message.reply_text("\n=== Recommandation de la Playlist ===")
     analyse = await analyse_playlist(playlist_id, playlist_title)
     await update.message.reply_text(analyse)
@@ -665,8 +673,6 @@ async def play(update,context):
             "--audio-format", "mp3",   
             # On définit la qualité correcte
             "--audio-quality", "192K",
-            # Ici on accepte les cookiers du navigateur
-            "--cookies-from-browser", "chrome",
             # On indique le modele de nom du fichier
             "-o",output_path,
             # La derniere etape c'est la recherche
@@ -694,6 +700,7 @@ async def main():
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
     
     app.add_handler(CommandHandler("start",start))
+    app.add_handler(CommandHandler("ping",ping))
     app.add_handler(CommandHandler("help",help_command))
     app.add_handler(CommandHandler("add",add))
     app.add_handler(CommandHandler("sub",sub))
@@ -732,6 +739,7 @@ if __name__ == "__main__":
 
     # Ajoute ici tes handlers, exactement comme dans main()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("ping",ping))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("add",add))
     app.add_handler(CommandHandler("sub",sub))
