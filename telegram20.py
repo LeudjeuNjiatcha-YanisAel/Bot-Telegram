@@ -740,6 +740,10 @@ async def news(update,context):
     category = context.args[0].lower() 
     articles = await asyncio.to_thread(call_news,category,"us",5)
     
+    if not articles:
+        await update.message.reply_text("Aucune news trouvée ❌")
+        return
+    
     for title, url in articles:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
     print("Informations des news affichées avec succès ! ✅")
