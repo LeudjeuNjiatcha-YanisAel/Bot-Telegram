@@ -374,13 +374,13 @@ async def clear(update,context):
     message_id = update.message.message_id
 
     if chat.type == "private":
-        empty_block = "\n\n".join(["\u200E" for _ in range(50)])
+        empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
 
     if chat.type in ["group","supergroup"]:
         try:
-            for i in range(message_id,message_id-50,-1):
+            for i in range(message_id,message_id-100,-1):
                 try:
                    await context.bot.delete_message(chat_id=chat_id,message_id=i)
                 except:
