@@ -378,16 +378,26 @@ async def clear(update,context):
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
 
-    if chat.type in ["group", "supergroup"]:
-        try:
-            for i in range(message_id, message_id-50, -1):
-                try:
-                    context.bot.delete_message(chat_id=chat_id,message_id=i)
-                except:
-                    pass
-            await update.message.reply_text("✅ 50 derniers messages supprimés")
-        except:
-            await update.message.reply_text("❌ Impossible de nettoyer (le bot doit être admin et avoir la permission de suppression)")
+    chat = update.effective_chat
+    bot_member = await chat.get_member(context.bot.id)
+
+    # Vérifie si le bot est admin et peut supprimer des messages
+    if not bot_member.can_delete_messages:
+        await update.message.reply_text("❌ Je n'ai pas la permission de supprimer les messages ici !")
+        return
+
+    try:
+        count = 0
+        # On récupère les 50 derniers messages
+        async for message in context.bot.get_chat(chat.id).iter_history(limit=50):
+            try:
+                await context.bot.delete_message(chat_id=chat.id,message_id=message.message_id)
+                count += 1
+            except:
+                pass  # Certains messages ne peuvent pas être supprimés (par ex. messages système)
+        await update.message.reply_text(f"✅ {count} derniers messages supprimés !")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Impossible de supprimer : {e}")
 
 async def send_online(app):
     for chat_id in users.keys():
@@ -734,10 +744,16 @@ async def news(update,context):
         await update.message.reply_text("Utilisation : /news <sujet>")
         return
     
-    list = call_news("technology","fr",5)
-    for title,url in list:
+    await update.message.reply_text("Domaine Disponible : business,entertainment,general,health,science,sports,technology")
+    await update.message.reply_text("Exemple : /news technology")
+    await update.message.reply_text("Recherche des news en cours... ⏳")
+    
+    category = context.args[0].lower() 
+    articles = call_news(category,country="fr",max_results=5)
+    
+    for title, url in articles:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
-    print("Informations des news afficher avec succes ! ✅")
+    print("Informations des news affichées avec succès ! ✅")
 
 
 async def football(update,context):
