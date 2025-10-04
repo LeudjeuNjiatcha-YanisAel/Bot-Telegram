@@ -681,21 +681,21 @@ async def play(update,context):
                 # La derniere etape c'est la recherche
                 f"ytsearch1:{music_query}"],check=True)
         
-        # Ici on liste les fichiers du dossier ça donne ts les fichiers contenus dans le dossier
-        files = os.listdir(tmpdir)
-        
-        # Ici on recupere les fichiers .mp3
-        files = [f for f in files if f.endswith("mp3")]
-        
-        # C'est pour recuperer la date et heure de la derniere modification via getmtime
-        files.sort(key=lambda f: os.path.getmtime(os.path.join(tmpdir,f)))
-        
-        # Prend le dernier fichier telecharger
-        latest_file = os.path.join(tmpdir,files[-1])
-        
-        with open(latest_file,"rb") as audio:
-            await update.message.reply_audio(audio)
-        await update.message.reply_text("Voici ta musique !")
+            # Ici on liste les fichiers du dossier ça donne ts les fichiers contenus dans le dossier
+            files = os.listdir(tmpdir)
+            
+            # Ici on recupere les fichiers .mp3
+            files = [f for f in files if f.endswith("mp3")]
+            
+            # C'est pour recuperer la date et heure de la derniere modification via getmtime
+            files.sort(key=lambda f: os.path.getmtime(os.path.join(tmpdir,f)))
+            
+            # Prend le dernier fichier telecharger
+            latest_file = os.path.join(tmpdir,files[-1])
+            
+            with open(latest_file,"rb") as audio:
+                await update.message.reply_audio(audio)
+            await update.message.reply_text("Voici ta musique !")
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
 
