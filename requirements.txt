@@ -5,3 +5,4 @@ google-genai
 nest-asyncio
 yt-dlp
 ffmpeg-python
+gnews

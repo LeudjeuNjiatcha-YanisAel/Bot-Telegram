@@ -4,6 +4,7 @@ import datetime
 import asyncio
 import json
 import os
+from gnews import GNews
 import tempfile
 import requests
 import subprocess
@@ -19,6 +20,7 @@ METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
 KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
 FOOTBALL = "A2OwCG4H2Hq5t0fAG0stROYqwwr1kx8qgN3akj1IUKZ5PotxHkZwUTQry5u7"
+google_news = GNews(language='fr', country='FR', period='7d', max_results=5)
 NEWS = "a3f9296a48a446e8b0f3626481922e3a"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
@@ -703,52 +705,61 @@ async def play(update,context):
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
 
-def call_news(category="general",country="us",max_results=5):
+def call_news(category_or_keyword="general", max_results=5):
     """
-    Récupère les dernières actualités par catégorie depuis NewsAPI.
-    
-    :param category: catégorie (ex: general, technology, sports, business, health, entertainment, science)
-    :param country: code pays (fr, us, gb, etc.)
-    :param max_results: nombre max d'articles à afficher
-    :return: liste de tuples (titre, url)
+    Récupère soit une catégorie de news, soit une recherche par mot-clé.
     """
-    url = "https://newsapi.org/v2/top-headlines"
-    params = {
-        "apiKey":NEWS,
-        "category":category,
-        "country":country,
-        "pageSize":max_results
+    category_map = {
+        "general": "À la une",
+        "business": "Économie",
+        "entertainment": "Divertissement",
+        "health": "Santé",
+        "science": "Science",
+        "sports": "Sports",
+        "technology": "Technologie"
     }
 
-    response = requests.get(url,params=params)
-    data = response.json()
+    # Si c'est une catégorie connue → on utilise get_news_by_topic
+    if category_or_keyword in category_map:
+        topic = category_map[category_or_keyword]
+        try:
+            articles = google_news.get_news_by_topic(topic)
+        except Exception as e:
+            return [(f"Erreur lors de la récupération des news (topic): {e}", "")]
+    else:
+        # Sinon on traite comme mot-clé
+        try:
+            articles = google_news.get_news(category_or_keyword)
+        except Exception as e:
+            return [(f"Erreur lors de la récupération des news (keyword): {e}", "")]
 
-    if data.get("status") != "ok":
-        return [("Erreur lors de la récupération des news", "")]
+    if not articles:
+        return [("Aucune actualité trouvée", "")]
 
-    articles = data.get("articles", [])
-    return [(a["title"], a["url"]) for a in articles]
+    return [(a["title"], a["url"]) for a in articles[:max_results]]
+
 
 async def news(update,context):
     if not context.args:
-        await update.message.reply_text("Utilisation : /news <sujet>")
+        await update.message.reply_text(
+            "Utilisation : /news <categorie|mot-clé>\n\n"
+            "Catégories disponibles : business, entertainment, general, health, science, sports, technology\n"
+            "Exemples :\n"
+            "   /news sports\n"
+            "   /news Messi"
+        )
         return
-    
-    await update.message.reply_text("Catégories disponibles : business, entertainment, general, health, science, sports, technology\n","Exemple : /news technology")
+
+    query = context.args[0].lower()
     await update.message.reply_text("Recherche des news en cours... ⏳")
-    
-    category = context.args[0].lower() 
-    articles = await asyncio.to_thread(call_news,category,"us",5)
-    
-    if not articles:
-        await update.message.reply_text("Aucune news trouvée ❌")
-        return
-    
+
+    articles = call_news(query, max_results=5)
+
     for title, url in articles:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
-    print("Informations des news affichées avec succès ! ✅")
 
-
+    print("✅ News affichées avec succès !")
+        
 async def football(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation : /football <nom du championnat>")
