@@ -420,7 +420,7 @@ async def auto_reply(update,context):
         await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "heure" in text:
         # Vérifier si l’utilisateur a demandé l’heure dans une ville spécifique
-        if "en " in text or "a" in text or "au" in text:
+        if "en " in text or "a " in text or "au " in text:
             try:
                 ville = text.split("en",1)[1].strip()
                 heure_ville = await local_time(ville)
@@ -699,7 +699,7 @@ async def play(update,context):
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
 
-async def call_news(category="general",country="fr",max_results=5):
+def call_news(category="general",country="fr",max_results=5):
     """
     Récupère les dernières actualités par catégorie depuis NewsAPI.
     
@@ -730,7 +730,7 @@ async def news(update,context):
         await update.message.reply_text("Utilisation : /news <sujet>")
         return
     
-    list = await call_news("technology","fr",5)
+    list = call_news("technology","fr",5)
     for title,url in list:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
 
