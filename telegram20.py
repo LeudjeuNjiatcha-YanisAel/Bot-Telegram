@@ -18,7 +18,7 @@ USERS_FILE = "users.json"
 METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
 KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
-NEWS = "pub_1cc01a62cffb465dae241e26294e5b9d"
+NEWS = "a3f9296a48a446e8b0f3626481922e3a"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
