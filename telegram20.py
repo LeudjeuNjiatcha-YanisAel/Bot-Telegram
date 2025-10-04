@@ -747,7 +747,7 @@ def call_news(category_or_keyword="general", max_results=5):
     return results
 
 
-async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def news(update,context):
     if not context.args:
         await update.message.reply_text(
             "Utilisation : /news <categorie|mot-clé>\n\n"
