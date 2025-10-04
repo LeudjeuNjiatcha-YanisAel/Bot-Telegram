@@ -667,19 +667,19 @@ async def play(update,context):
         # Modèle de nom qu'on utilisera en sortie par exemple titre.mp3
             output_path = os.path.join(tmpdir,"%(title).50s.%(ext)s")
         
-        subprocess.run([
-            # Ici on appelle la commande yt-dlp
-            "yt-dlp",
-            # Extrait slt l'audio
-            "--extract-audio",
-            # Convertit le fichier en mp3
-            "--audio-format", "mp3",   
-            # On définit la qualité correcte
-            "--audio-quality", "192K",
-            # On indique le modele de nom du fichier
-            "-o",output_path,
-            # La derniere etape c'est la recherche
-            f"ytsearch1:{music_query}"],check=True)
+            subprocess.run([
+                # Ici on appelle la commande yt-dlp
+                "yt-dlp",
+                # Extrait slt l'audio
+                "--extract-audio",
+                # Convertit le fichier en mp3
+                "--audio-format", "mp3",   
+                # On définit la qualité correcte
+                "--audio-quality", "192K",
+                # On indique le modele de nom du fichier
+                "-o",output_path,
+                # La derniere etape c'est la recherche
+                f"ytsearch1:{music_query}"],check=True)
         
         # Ici on liste les fichiers du dossier ça donne ts les fichiers contenus dans le dossier
         files = os.listdir(tmpdir)
