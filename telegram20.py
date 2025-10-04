@@ -78,6 +78,7 @@ async def start(update,context):
         "▶️ /video nom de la video → Rechercher une video\n"
         "📰 /news sujet → Rechercher des actualités\n"
         "🌦 /meteo ville → Météo locale\n"
+        "   /pp → Recupere La Photo de profil\n"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
@@ -99,7 +100,12 @@ async def about(update,context):
         "╚════════════════════════════╝\n\n"
         "✨ *Version* : `20.6`\n"
         "💫 *Technologies* :\n"
-        "   🥇 Python\n"
+        "   🥇 Python3\n"
+            "API du bot Telegram ( python-telegram-bot)"
+            "API OpenWeather (Météo)"
+            "API YouTube (Recherche Vidéo)"
+            "PI TimeZoneDB (Heure locale)"
+            "IA générative de Google (Gemini)"
         "   🥈 VPS (Serveurs)\n\n"
         "👨‍💻 *Concepteur* : *Machine*\n"
         "📱 *Contact* : [WhatsApp](https://wa.me/237620834784)\n\n"
@@ -139,6 +145,7 @@ async def help_command(update,context):
         "/play titre de la musique → Jouez une musique\n"
         "/video nom de la video → Rechercher une video\n"
         "/news sujet → Rechercher des actualités\n"
+        "/pp → Recupere La Photo de profil\n"
         "/meteo ville → Météo locale\n"
         "/ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -768,7 +775,24 @@ async def news(update,context):
         await update.message.reply_text(message, parse_mode="Markdown")
 
     print("✅ News avec résumés affichées !")
-        
+
+async def pp(update,context):
+    # Reponses a un message
+    if update.message.reply_to_message:
+        user_id = update.message.reply_to_message.from_user.id
+    else:
+        user_id = update.message.from_user.id
+    photos = await context.bot.get_user_profile_photos(user_id)
+    
+    if photos.total_count == 0:
+        await update.message.reply_text("❌ Cet utilisateur n’a pas de photo de profil.")
+    return
+    # Prendre la plus récente (dernier élément de la liste)
+    photo_file_id = photos.photos[0][-1].file_id
+
+    # Envoyer la photo au chat
+    await update.message.reply_photo(photo_file_id,caption="📸 Photo de profil récupérée ✅")   
+
 async def football(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation : /football <nom du championnat>")
@@ -836,6 +860,7 @@ async def main():
     app.add_handler(CommandHandler("time",time))
     app.add_handler(CommandHandler("clear",clear))
     app.add_handler(CommandHandler("ask",ask))
+    app.add_handler(CommandHandler("pp",pp))
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
@@ -877,6 +902,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("time",time))
     app.add_handler(CommandHandler("clear",clear))
     app.add_handler(CommandHandler("ask",ask))
+    app.add_handler(CommandHandler("pp",pp))
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
