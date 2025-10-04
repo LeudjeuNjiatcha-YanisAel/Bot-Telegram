@@ -4,8 +4,7 @@ import datetime
 import asyncio
 import json
 import os
-import sys
-import signal
+import tempfile
 import requests
 import subprocess
 from googleapiclient.discovery import build
@@ -19,10 +18,12 @@ USERS_FILE = "users.json"
 METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
 KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
+NEWS = "pub_1cc01a62cffb465dae241e26294e5b9d"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
 jeux_en_cours1 = {}
+
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
         try:
@@ -73,6 +74,7 @@ async def start(update,context):
         "⏰ /time ville → Heure locale\n"
         "🎼️ /play titre de la musique → Jouez une musique\n"
         "▶️ /video nom de la video → Rechercher une video\n"
+        "📰 /news sujet → Rechercher des actualités\n"
         "🌦 /meteo ville → Météo locale\n"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -134,6 +136,7 @@ async def help_command(update,context):
         "/time ville → Heure locale\n"
         "/play titre de la musique → Jouez une musique\n"
         "/video nom de la video → Rechercher une video\n"
+        "/news sujet → Rechercher des actualités\n"
         "/meteo ville → Météo locale\n"
         "/ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -654,13 +657,10 @@ async def play(update,context):
         await update.message.reply_text("Utilisation de la commande : /play <nom de la musique>")
     # musique a rechercher
     music_query = " ".join(context.args)
-    user = update.message.from_user
-    
-    # ici on verifie que le dossier MUSIC sinon on le cree
-    os.makedirs(MUSIC,exist_ok=True)
-    
+     
+    with tempfile.TemporaryDirectory() as tmpdir:
     # Modèle de nom qu'on utilisera en sortie par exemple titre.mp3
-    output_path = os.path.join(MUSIC,"%(title).50s.%(ext)s")
+        output_path = os.path.join(tmpdir,"%(title).50s.%(ext)s")
 
     # Dans cette partie nous commençons a telecharger le media
     try :
@@ -679,7 +679,7 @@ async def play(update,context):
             f"ytsearch1:{music_query}"],check=True)
         
         # Ici on liste les fichiers du dossier ça donne ts les fichiers contenus dans le dossier
-        files = os.listdir(MUSIC)
+        files = os.listdir(tmpdir)
         
         # Ici on recupere les fichiers .mp3
         files = [f for f in files if f.endswith("mp3")]
@@ -688,13 +688,44 @@ async def play(update,context):
         files.sort(key=lambda f: os.path.getmtime(os.path.join(MUSIC,f)))
         
         # Prend le dernier fichier telecharger
-        latest_file = os.path.join(MUSIC,files[-1])
+        latest_file = os.path.join(tmpdir,files[-1])
         
         with open(latest_file,"rb") as audio:
             await update.message.reply_audio(audio)
         await update.message.reply_text("Voici ta musique !")
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
+
+async def call_news(category="general",country="fr",max_results=5):
+    """
+    Récupère les dernières actualités par catégorie depuis NewsAPI.
+    
+    :param category: catégorie (ex: general, technology, sports, business, health, entertainment, science)
+    :param country: code pays (fr, us, gb, etc.)
+    :param max_results: nombre max d'articles à afficher
+    :return: liste de tuples (titre, url)
+    """
+    url = "https://newsapi.org/v2/top-headlines"
+    params = {
+        "apiKey":NEWS,
+        "category": category,
+        "country": country,
+        "pageSize": max_results
+    }
+
+    response = requests.get(url,params=params)
+    data = response.json()
+
+    if data.get("status") != "ok":
+        return [("Erreur lors de la récupération des news", "")]
+
+    articles = data.get("articles", [])
+    return [(a["title"], a["url"]) for a in articles]
+
+async def news(update,context):
+    list = await call_news("technology","fr",5)
+    for title,url in list:
+        await update.message.reply_text(f"📰 {title}\n🔗 {url}")
 
 async def main():
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
@@ -720,6 +751,7 @@ async def main():
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
+    app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("meteo",meteo))
    
     print("Machine_Bot a démarré...")
@@ -759,6 +791,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
+    app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("meteo",meteo))
     
     # Lancement du bot
