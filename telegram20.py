@@ -655,15 +655,18 @@ async def youtube_se(update,context):
 async def play(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation de la commande : /play <nom de la musique>")
+        return
+    
     # musique a rechercher
     music_query = " ".join(context.args)
      
-    with tempfile.TemporaryDirectory() as tmpdir:
-    # Modèle de nom qu'on utilisera en sortie par exemple titre.mp3
-        output_path = os.path.join(tmpdir,"%(title).50s.%(ext)s")
-
     # Dans cette partie nous commençons a telecharger le media
     try :
+        # Creation d'un dossier temporaire
+        with tempfile.TemporaryDirectory() as tmpdir:
+        # Modèle de nom qu'on utilisera en sortie par exemple titre.mp3
+            output_path = os.path.join(tmpdir,"%(title).50s.%(ext)s")
+        
         subprocess.run([
             # Ici on appelle la commande yt-dlp
             "yt-dlp",
@@ -685,7 +688,7 @@ async def play(update,context):
         files = [f for f in files if f.endswith("mp3")]
         
         # C'est pour recuperer la date et heure de la derniere modification via getmtime
-        files.sort(key=lambda f: os.path.getmtime(os.path.join(MUSIC,f)))
+        files.sort(key=lambda f: os.path.getmtime(os.path.join(tmpdir,f)))
         
         # Prend le dernier fichier telecharger
         latest_file = os.path.join(tmpdir,files[-1])
@@ -723,6 +726,10 @@ async def call_news(category="general",country="fr",max_results=5):
     return [(a["title"], a["url"]) for a in articles]
 
 async def news(update,context):
+    if not context.args:
+        await update.message.reply_text("Utilisation : /news <sujet>")
+        return
+    
     list = await call_news("technology","fr",5)
     for title,url in list:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
