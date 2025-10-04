@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Installer ffmpeg pour yt-dlp
-RUN apt-get install -y ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
 
 # Créer un répertoire de travail
 WORKDIR /app
@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Lancer ton bot (si ton fichier principal s'appelle bot.py)
-CMD ["python", "telegram.py"]
+CMD ["python", "telegram20.py"]
