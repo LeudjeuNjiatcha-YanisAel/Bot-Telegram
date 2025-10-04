@@ -703,7 +703,7 @@ async def play(update,context):
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
 
-def call_news(category="general",country="fr",max_results=5):
+def call_news(category="general",country="us",max_results=5):
     """
     Récupère les dernières actualités par catégorie depuis NewsAPI.
     
@@ -734,12 +734,11 @@ async def news(update,context):
         await update.message.reply_text("Utilisation : /news <sujet>")
         return
     
-    await update.message.reply_text("Domaine Disponible : business,entertainment,general,health,science,sports,technology")
-    await update.message.reply_text("Exemple : /news technology")
+    await update.message.reply_text("Catégories disponibles : business, entertainment, general, health, science, sports, technology\n","Exemple : /news technology")
     await update.message.reply_text("Recherche des news en cours... ⏳")
     
     category = context.args[0].lower() 
-    articles = call_news(category,country="fr",max_results=5)
+    articles = await asyncio.to_thread(call_news,category,"us",5)
     
     for title, url in articles:
         await update.message.reply_text(f"📰 {title}\n🔗 {url}")
