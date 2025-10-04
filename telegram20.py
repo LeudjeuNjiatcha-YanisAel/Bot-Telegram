@@ -382,7 +382,7 @@ async def clear(update,context):
         try:
             for i in range(message_id, message_id-50, -1):
                 try:
-                    context.bot.delete_message(chat_id=chat_id, message_id=i)
+                    context.bot.delete_message(chat_id=chat_id,message_id=i)
                 except:
                     pass
             await update.message.reply_text("✅ 50 derniers messages supprimés")
@@ -423,6 +423,8 @@ async def auto_reply(update,context):
         if "en " in text or "a " in text or "au " in text:
             try:
                 ville = text.split("en",1)[1].strip()
+                ville = text.split("a",1)[1].strip()
+                ville = text.split("au",1)[1].strip()
                 heure_ville = await local_time(ville)
                 reply = f"⏰ Il est actuellement {heure_ville} à {ville.title()}"
             except Exception as e:
