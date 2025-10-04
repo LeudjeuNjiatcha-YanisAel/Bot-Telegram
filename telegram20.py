@@ -459,14 +459,14 @@ async def auto_reply(update,context):
         reply = "Encule 🖕️ "
         await update.message.reply_text("Machine_Bot🤖 : " +reply)
     elif  "aide" in text or "help" in text:
-        reply = await help_command()
+        reply = await help_command(update,context)
         await update.message.reply_text("Machine_Bot🤖 \n" +reply)
     else:
         try:
             client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
 
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.5-pro",
                 contents=text
             )
 
