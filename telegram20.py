@@ -36,7 +36,7 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def ping(update,context):
-    await update.message.reply_text("Pong! 🤖 MachineBot est en ligne ✅")
+    await update.message.reply_text("Pong! 🤖 MACHINE BOT est en ligne ✅")
 
 async def start(update,context):
     user = update.message.from_user
@@ -810,6 +810,7 @@ async def main():
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
+    app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("meteo",meteo))
    
