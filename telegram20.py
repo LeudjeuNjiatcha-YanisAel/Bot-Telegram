@@ -420,9 +420,9 @@ async def auto_reply(update,context):
         await update.message.reply_text("Machine_Bot🤖 : " + reply)
     elif "heure" in text:
         # Vérifier si l’utilisateur a demandé l’heure dans une ville spécifique
-        if "en " in text or "a" in text:
+        if "en " in text or "a" in text or "au" in text:
             try:
-                ville = text.split("en", 1)[1].strip()
+                ville = text.split("en",1)[1].strip()
                 heure_ville = await local_time(ville)
                 reply = f"⏰ Il est actuellement {heure_ville} à {ville.title()}"
             except Exception as e:
