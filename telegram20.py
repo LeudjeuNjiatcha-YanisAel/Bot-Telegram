@@ -294,7 +294,7 @@ async def ask(update,context):
         answer = response.text
         for i in range(0,len(answer),2000) :
             await update.message.reply_text("Machine_IA🤖 \n ")
-            await update.message.reply_text("💡 Réponse : "+answer[i:i+2000])
+            await update.message.reply_text("💡 Réponse : "+answer[i:i+4096])
     except Exception as e:
         await update.message.reply_text(f"⚠️ Machine IA : {e}")
 
@@ -821,50 +821,66 @@ async def sticker(update,context):
     #envoie du sticker
     await update.message.reply_sticker(sticker=output)
     
-async def football(update,context):
+async def football(update, context):
     if not context.args:
         await update.message.reply_text("Utilisation : /football <nom du championnat>")
         return
-    
+
     league_name = " ".join(context.args).lower()
     league_id = None
+
     leagues = {
-        "premier league":39,
-        "la liga":140,
-        "serie a":135,
-        "bundesliga":78,
-        "ligue 1":61
+        "premier league": 8,      # England
+        "la liga": 564,           # Spain
+        "serie a": 384,           # Italy
+        "bundesliga": 82,         # Germany
+        "ligue 1": 301            # France
     }
-    
+
     for name, id in leagues.items():
-        if league_name in name:
+        if league_name.replace(" ", "") in name.replace(" ", ""):
             league_id = id
             break
-    
+
     if not league_id:
-        await update.message.reply_text("Championat non reconnu. Exemples : Premier League, La Liga, Serie A, Bundesliga, Ligue 1")
+        await update.message.reply_text(
+            "Championnat non reconnu. Exemples : Premier League, La Liga, Serie A, Bundesliga, Ligue 1"
+        )
         return
-    
-    url = f"https://v3.football.api-sports.io/fixtures"
-    headers = {"x-apisports-key":FOOTBALL}
-    params = {"league": league_id, "season": 2023, "next": 5}
-    
-    response = requests.get(url,headers=headers,params=params)
+
+    # Année actuelle
+    year = datetime.now().year
+
+    url = f"https://api.sportmonks.com/v3/football/fixtures"
+    params = {
+        "api_token": FOOTBALL,
+        "include": "teams",  # inclure les équipes
+        "filters": f"season_id:{year},league_id:{league_id}",
+        "sort": "starting_at",
+        "limit": 5
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        await update.message.reply_text(f"Erreur API : {response.status_code}")
+        return
+
     data = response.json()
-    
-    if data.get("results") == 0:
+
+    if "data" not in data or len(data["data"]) == 0:
         await update.message.reply_text("Aucun match trouvé pour ce championnat.")
         return
-    
-    fixtures = data.get("response", [])
-    message = f"📅 Prochains matchs de {league_name.title()}:\n\n"
-    
-    for fixture in fixtures:
-        teams = fixture["teams"]
-        date = fixture["fixture"]["date"]
-        venue = fixture["fixture"]["venue"]["name"]
-        message += f"{teams['home']['name']} vs {teams['away']['name']}\nDate: {date}\nLieu: {venue}\n\n"
-    
+
+    fixtures = data["data"]
+
+    message = f"📅 Prochains matchs de {league_name.title()} :\n\n"
+    for match in fixtures[:5]:
+        home = match.get("home_team_name", "Équipe domicile inconnue")
+        away = match.get("away_team_name", "Équipe extérieure inconnue")
+        date = match.get("starting_at", "Date inconnue").split("T")[0]
+        message += f"⚽ {home} vs {away} ({date})\n"
+
     await update.message.reply_text(message)
     
 async def main():
