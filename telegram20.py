@@ -851,7 +851,7 @@ async def football(update,context):
     params = {
         "api_token":FOOTBALL,
         "per_page": 50,            # on récupère jusqu'à 50 fixtures puis on filtre localement
-        "include": "localTeam,visitorTeam"  # optionnel selon ce que SportMonks renvoie
+          # optionnel selon ce que SportMonks renvoie
     }
 
     # Requête HTTP de façon non bloquante (exécutée dans un thread)
