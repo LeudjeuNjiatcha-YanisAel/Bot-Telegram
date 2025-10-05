@@ -1,7 +1,7 @@
 import random
 from random import shuffle
 import datetime
-from datetime import date
+from datetime import date,timedelta
 import asyncio
 import json
 import os
@@ -846,15 +846,22 @@ async def football(update,context):
         return
 
     today = date.today()
-    fixtures_url = f"{URL}/matches?competitions={league_code}&dateFrom={today}&dateTo={today}"
+    yesterday = today - timedelta(days=1)
+    tomorrow = today + timedelta(days=1)
+
+    # 🔧 Étendre la recherche à 3 jours (hier, aujourd’hui, demain)
+    fixtures_url = (
+        f"{URL}/matches?competitions={league_code}"
+        f"&dateFrom={yesterday}&dateTo={tomorrow}"
+    )
     response = requests.get(fixtures_url, headers=HEADERS).json()
     matches = response.get("matches", [])
 
     if not matches:
-        await update.message.reply_text("Aucun match prévu aujourd’hui pour ce championnat.")
+        await update.message.reply_text("Aucun match trouvé pour ces dates.")
         return
 
-    message = f"📅 *Matchs du jour — {league_name.title()} ({today})*\n\n"
+    message = f"📅 *Matchs récents et à venir — {league_name.title()}*\n\n"
 
     for match in matches:
         home = match["homeTeam"]["name"]
@@ -866,32 +873,36 @@ async def football(update,context):
             home_score = match["score"]["fullTime"]["home"]
             away_score = match["score"]["fullTime"]["away"]
             message += f"🏁 {home} {home_score} - {away_score} {away}\n\n"
-            continue
 
-        # 📊 Si le match n’est pas terminé → faire une prédiction simple
-        # (basée sur les classements récents)
-        try:
-            standings_url = f"{URL}/competitions/{league_code}/standings"
-            standings = requests.get(standings_url, headers=HEADERS).json()
-            table = standings["standings"][0]["table"]
+        # 🔴 Match en cours
+        elif status == "IN_PLAY":
+            home_score = match["score"]["fullTime"]["home"] or 0
+            away_score = match["score"]["fullTime"]["away"] or 0
+            message += f"⏱️ {home} {home_score} - {away_score} {away} (en cours)\n\n"
 
-            home_rank = next((t["position"] for t in table if t["team"]["name"] == home), None)
-            away_rank = next((t["position"] for t in table if t["team"]["name"] == away), None)
+        # ⏳ Match à venir → prédiction
+        else:
+            try:
+                standings_url = f"{URL}/competitions/{league_code}/standings"
+                standings = requests.get(standings_url, headers=HEADERS).json()
+                table = standings["standings"][0]["table"]
 
-            if home_rank and away_rank:
-                if home_rank < away_rank:
-                    prediction = f"Victoire probable de {home} 🏠 (meilleur classement)"
-                elif home_rank > away_rank:
-                    prediction = f"Victoire probable de {away} 🚗 (meilleur classement)"
+                home_rank = next((t["position"] for t in table if t["team"]["name"] == home), None)
+                away_rank = next((t["position"] for t in table if t["team"]["name"] == away), None)
+
+                if home_rank and away_rank:
+                    if home_rank < away_rank:
+                        prediction = f"Victoire probable de {home} 🏠 (meilleur classement)"
+                    elif home_rank > away_rank:
+                        prediction = f"Victoire probable de {away} 🚗 (meilleur classement)"
+                    else:
+                        prediction = "Match nul probable 🤝"
                 else:
-                    prediction = "Match nul probable 🤝"
-            else:
-                prediction = "Impossible de prédire (classement inconnu)"
+                    prediction = "Impossible de prédire (classement inconnu)"
 
-            message += f"⚽ {home} vs {away}\n→ {prediction}\n\n"
-
-        except Exception:
-            message += f"⚽ {home} vs {away}\n❌ Impossible de générer une prédiction.\n\n"
+                message += f"⚽ {home} vs {away}\n→ {prediction}\n\n"
+            except Exception:
+                message += f"⚽ {home} vs {away}\n❌ Erreur de prédiction.\n\n"
 
     await update.message.reply_text(message, parse_mode="Markdown")
         
