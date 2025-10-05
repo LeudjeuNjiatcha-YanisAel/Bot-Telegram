@@ -27,6 +27,14 @@ NEWS = "a3f9296a48a446e8b0f3626481922e3a"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
+LEAGUES = {
+    "premier league": 8,
+    "la liga": 564,
+    "serie a": 384,
+    "bundesliga": 82,
+    "ligue 1": 301
+}
+
 
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
@@ -821,25 +829,16 @@ async def sticker(update,context):
     #envoie du sticker
     await update.message.reply_sticker(sticker=output)
     
-async def football(update, context):
+async def football(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation : /football <nom du championnat>")
         return
 
     league_name = " ".join(context.args).lower()
     league_id = None
-
-    leagues = {
-        "premier league": 8,      # England
-        "la liga": 564,           # Spain
-        "serie a": 384,           # Italy
-        "bundesliga": 82,         # Germany
-        "ligue 1": 301            # France
-    }
-
-    for name, id in leagues.items():
+    for name, id_ in LEAGUES.items():
         if league_name.replace(" ", "") in name.replace(" ", ""):
-            league_id = id
+            league_id = id_
             break
 
     if not league_id:
@@ -848,38 +847,80 @@ async def football(update, context):
         )
         return
 
-    # Année actuelle
-    year = datetime.now().year
-
-    url = f"https://api.sportmonks.com/v3/football/fixtures"
+    url = "https://api.sportmonks.com/v3/football/fixtures"
     params = {
-        "api_token": FOOTBALL,
-        "include": "teams",  # inclure les équipes
-        "filters": f"season_id:{year},league_id:{league_id}",
-        "sort": "starting_at",
-        "limit": 5
+        "api_token":FOOTBALL,
+        "per_page": 50,            # on récupère jusqu'à 50 fixtures puis on filtre localement
+        "include": "localTeam,visitorTeam"  # optionnel selon ce que SportMonks renvoie
     }
 
-    response = requests.get(url, params=params)
+    # Requête HTTP de façon non bloquante (exécutée dans un thread)
+    def do_get():
+        r = requests.get(url, params=params, timeout=15)
+        return r.status_code, r.text, r.json()
 
-    if response.status_code != 200:
-        await update.message.reply_text(f"Erreur API : {response.status_code}")
+    try:
+        status, text, data = await asyncio.to_thread(do_get)
+    except Exception as e:
+        await update.message.reply_text(f"Erreur réseau / timeout: {e}")
         return
 
-    data = response.json()
-
-    if "data" not in data or len(data["data"]) == 0:
-        await update.message.reply_text("Aucun match trouvé pour ce championnat.")
+    if status != 200:
+        await update.message.reply_text(f"Erreur API ({status})\nRéponse: {text}")
         return
 
-    fixtures = data["data"]
+    fixtures = data.get("data") or []
+    if not fixtures:
+        await update.message.reply_text("Aucun match trouvé dans la réponse de l'API.")
+        return
+
+    # Filtrer par league_id et date future
+    now = datetime.utcnow()
+    upcoming = []
+    for f in fixtures:
+        try:
+            # SportMonks peut renvoyer league_id directement ou dans une clé imbriquée
+            lid = f.get("league_id") or (f.get("league") or {}).get("data", {}).get("id")
+            # différentes clés possibles pour la date selon la version de l'API
+            start = f.get("starting_at") or f.get("starting_at") or f.get("time") or f.get("fixture", {}).get("date")
+            if not start:
+                continue
+            # Garder seulement les matchs du bon championnat
+            if str(lid) != str(league_id):
+                continue
+            # ajouter à la liste (on affiche la date brute telle quelle)
+            upcoming.append((start, f))
+        except Exception:
+            continue
+
+    if not upcoming:
+        await update.message.reply_text("Aucun match futur trouvé pour ce championnat (vérifie l'ID/saison).")
+        return
+
+    # Trier par date et prendre les 5 premiers
+    upcoming.sort(key=lambda x: x[0])
+    upcoming = upcoming[:5]
 
     message = f"📅 Prochains matchs de {league_name.title()} :\n\n"
-    for match in fixtures[:5]:
-        home = match.get("home_team_name", "Équipe domicile inconnue")
-        away = match.get("away_team_name", "Équipe extérieure inconnue")
-        date = match.get("starting_at", "Date inconnue").split("T")[0]
-        message += f"⚽ {home} vs {away} ({date})\n"
+    for start, f in upcoming:
+        # Plusieurs formats possibles selon le payload de SportMonks
+        home = (f.get("localTeam", {}) .get("data", {}) .get("name")
+                or f.get("home_team_name") or f.get("homeTeam", {}).get("data", {}).get("name")
+                or "Domicile")
+        away = (f.get("visitorTeam", {}).get("data", {}).get("name")
+                or f.get("away_team_name") or f.get("awayTeam", {}).get("data", {}).get("name")
+                or "Extérieur")
+        # état du match (si disponible)
+        status_match = None
+        if isinstance(f.get("time"), dict):
+            status_match = f["time"].get("status")
+        elif f.get("status"):
+            status_match = f.get("status")
+
+        message += f"⚽ {home} vs {away} — {start}"
+        if status_match:
+            message += f" ({status_match})"
+        message += "\n"
 
     await update.message.reply_text(message)
     
