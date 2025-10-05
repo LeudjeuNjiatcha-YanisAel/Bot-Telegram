@@ -1,6 +1,7 @@
 import random
 from random import shuffle
 import datetime
+from datetime import date
 import asyncio
 import json
 import os
@@ -23,20 +24,21 @@ KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
 FOOTBALL = "a55174569e0a44248a0a9e02002d456e"
 URL = "https://api.football-data.org/v4"
+HEADERS = {"X-Auth-Token":FOOTBALL}
 
 google_news = GNews(language='fr',country='FR',period='7d',max_results=5)
 NEWS = "a3f9296a48a446e8b0f3626481922e3a"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
-LEAGUES = {
-    "premier league": 8,
-    "la liga": 564,
-    "serie a": 384,
-    "bundesliga": 82,
-    "ligue 1": 301
-}
 
+LEAGUES = {
+    "premier league": "PL",
+    "la liga": "PD",
+    "serie a": "SA",
+    "ligue 1": "FL1",
+    "bundesliga": "BL1"
+}
 
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
@@ -832,69 +834,67 @@ async def sticker(update,context):
     await update.message.reply_sticker(sticker=output)
 
 
-def predict(home,away):
-    """Petite fonction de prédiction aléatoire (tu pourras l'améliorer plus tard)"""
-    choix = [
-        f"{home} gagne 🏠",
-        "Match nul 🤝",
-        f"{away} gagne 🚗"
-    ]
-    return random.choice(choix)
-
 async def football(update,context):
-    args = context.args
-    league_name = " ".join(args).lower() if args else None
-
-    today = datetime.datetime.now().strftime("%Y-%m-%d")
-
-    await update.message.reply_text(f"📅 Récupération des matchs du {today}...")
-
-    headers = {"X-Auth-Token": FOOTBALL}
-
-    # 🔍 Liste des championnats disponibles sur Football-Data
-    leagues = {
-        "premier league": "PL",
-        "la liga": "PD",
-        "serie a": "SA",
-        "bundesliga": "BL1",
-        "ligue 1": "L1",
-        "eredivisie": "DED",
-        "uefa champions league": "CL"
-    }
-
-    # Si l’utilisateur filtre par championnat
-    if league_name and league_name in leagues:
-        league_code = leagues[league_name]
-        url = f"{URL}/competitions/{league_code}/matches?dateFrom={today}&dateTo={today}"
-    else:
-        # Tous les matchs du jour (toutes compétitions)
-        url = f"{URL}/matches?dateFrom={today}&dateTo={today}"
-
-    response = requests.get(url, headers=headers)
-    data = response.json()
-
-    # Vérification des données
-    if "matches" not in data or len(data["matches"]) == 0:
-        await update.message.reply_text("❌ Aucun match trouvé aujourd'hui.")
+    if not context.args:
+        await update.message.reply_text("Utilisation : /football <nom du championnat>")
         return
 
-    # 🧾 Préparation du message
-    message = f"⚽ *Matchs du {today}*\n\n"
+    league_name = " ".join(context.args).lower()
+    league_code = LEAGUES.get(league_name)
+    if not league_code:
+        await update.message.reply_text("Championnat non reconnu.")
+        return
 
-    for match in data["matches"]:
+    today = date.today()
+    fixtures_url = f"{URL}/matches?competitions={league_code}&dateFrom={today}&dateTo={today}"
+    response = requests.get(fixtures_url, headers=HEADERS).json()
+    matches = response.get("matches", [])
+
+    if not matches:
+        await update.message.reply_text("Aucun match prévu aujourd’hui pour ce championnat.")
+        return
+
+    message = f"📅 *Matchs du jour — {league_name.title()} ({today})*\n\n"
+
+    for match in matches:
         home = match["homeTeam"]["name"]
         away = match["awayTeam"]["name"]
-        competition = match["competition"]["name"]
+        status = match["status"]
 
-        # 🧠 Générer une prédiction basique
-        prediction = predict(home,away)
+        # 🏁 Si match terminé → afficher le score
+        if status in ["FINISHED", "AWARDED"]:
+            home_score = match["score"]["fullTime"]["home"]
+            away_score = match["score"]["fullTime"]["away"]
+            message += f"🏁 {home} {home_score} - {away_score} {away}\n\n"
+            continue
 
-        message += f"🏆 {competition}\n"
-        message += f"⚔️ {home} vs {away}\n"
-        message += f"🔮 *Prédiction* : {prediction}\n\n"
+        # 📊 Si le match n’est pas terminé → faire une prédiction simple
+        # (basée sur les classements récents)
+        try:
+            standings_url = f"{URL}/competitions/{league_code}/standings"
+            standings = requests.get(standings_url, headers=HEADERS).json()
+            table = standings["standings"][0]["table"]
+
+            home_rank = next((t["position"] for t in table if t["team"]["name"] == home), None)
+            away_rank = next((t["position"] for t in table if t["team"]["name"] == away), None)
+
+            if home_rank and away_rank:
+                if home_rank < away_rank:
+                    prediction = f"Victoire probable de {home} 🏠 (meilleur classement)"
+                elif home_rank > away_rank:
+                    prediction = f"Victoire probable de {away} 🚗 (meilleur classement)"
+                else:
+                    prediction = "Match nul probable 🤝"
+            else:
+                prediction = "Impossible de prédire (classement inconnu)"
+
+            message += f"⚽ {home} vs {away}\n→ {prediction}\n\n"
+
+        except Exception:
+            message += f"⚽ {home} vs {away}\n❌ Impossible de générer une prédiction.\n\n"
 
     await update.message.reply_text(message, parse_mode="Markdown")
-    
+        
 async def main():
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
     
