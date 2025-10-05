@@ -2,6 +2,7 @@ python-telegram-bot==20.6
 requests
 google-api-python-client
 google-genai
+google-generativeai
 nest-asyncio
 yt-dlp
 ffmpeg-python
