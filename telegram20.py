@@ -256,7 +256,7 @@ async def send(update,context):
             
             if name.lower() in [username, first_name, last_name, full_name] or str(uid) == name:
                 chat_id = int(uid)
-                context.bot.send_message(
+                await context.bot.send_message(
                     chat_id=chat_id,
                     text=f"📩 Message de {sender} :\n\n\n\n{texte}"
                 )
