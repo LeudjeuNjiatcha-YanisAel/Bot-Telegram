@@ -21,8 +21,10 @@ USERS_FILE = "users.json"
 METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
 KEY_TIME = "9UJS6LPXID3A"
 MUSIC = "music"
-FOOTBALL = "A2OwCG4H2Hq5t0fAG0stROYqwwr1kx8qgN3akj1IUKZ5PotxHkZwUTQry5u7"
-google_news = GNews(language='fr', country='FR', period='7d', max_results=5)
+FOOTBALL = "a55174569e0a44248a0a9e02002d456e"
+URL = "https://api.football-data.org/v4"
+
+google_news = GNews(language='fr',country='FR',period='7d',max_results=5)
 NEWS = "a3f9296a48a446e8b0f3626481922e3a"
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
@@ -828,101 +830,70 @@ async def sticker(update,context):
     
     #envoie du sticker
     await update.message.reply_sticker(sticker=output)
-    
+
+
+def predict(home,away):
+    """Petite fonction de prédiction aléatoire (tu pourras l'améliorer plus tard)"""
+    choix = [
+        f"{home} gagne 🏠",
+        "Match nul 🤝",
+        f"{away} gagne 🚗"
+    ]
+    return random.choice(choix)
+
 async def football(update,context):
-    if not context.args:
-        await update.message.reply_text("Utilisation : /football <nom du championnat>")
-        return
+    args = context.args
+    league_name = " ".join(args).lower() if args else None
 
-    league_name = " ".join(context.args).lower()
-    league_id = None
-    for name, id_ in LEAGUES.items():
-        if league_name.replace(" ", "") in name.replace(" ", ""):
-            league_id = id_
-            break
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
 
-    if not league_id:
-        await update.message.reply_text(
-            "Championnat non reconnu. Exemples : Premier League, La Liga, Serie A, Bundesliga, Ligue 1"
-        )
-        return
+    await update.message.reply_text(f"📅 Récupération des matchs du {today}...")
 
-    url = "https://api.sportmonks.com/v3/football/fixtures"
-    params = {
-        "api_token":FOOTBALL,
-        "per_page": 50,            # on récupère jusqu'à 50 fixtures puis on filtre localement
-          # optionnel selon ce que SportMonks renvoie
+    headers = {"X-Auth-Token": FOOTBALL}
+
+    # 🔍 Liste des championnats disponibles sur Football-Data
+    leagues = {
+        "premier league": "PL",
+        "la liga": "PD",
+        "serie a": "SA",
+        "bundesliga": "BL1",
+        "ligue 1": "L1",
+        "eredivisie": "DED",
+        "uefa champions league": "CL"
     }
 
-    # Requête HTTP de façon non bloquante (exécutée dans un thread)
-    def do_get():
-        r = requests.get(url, params=params, timeout=15)
-        return r.status_code, r.text, r.json()
+    # Si l’utilisateur filtre par championnat
+    if league_name and league_name in leagues:
+        league_code = leagues[league_name]
+        url = f"{URL}/competitions/{league_code}/matches?dateFrom={today}&dateTo={today}"
+    else:
+        # Tous les matchs du jour (toutes compétitions)
+        url = f"{URL}/matches?dateFrom={today}&dateTo={today}"
 
-    try:
-        status, text, data = await asyncio.to_thread(do_get)
-    except Exception as e:
-        await update.message.reply_text(f"Erreur réseau / timeout: {e}")
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    # Vérification des données
+    if "matches" not in data or len(data["matches"]) == 0:
+        await update.message.reply_text("❌ Aucun match trouvé aujourd'hui.")
         return
 
-    if status != 200:
-        await update.message.reply_text(f"Erreur API ({status})\nRéponse: {text}")
-        return
+    # 🧾 Préparation du message
+    message = f"⚽ *Matchs du {today}*\n\n"
 
-    fixtures = data.get("data") or []
-    if not fixtures:
-        await update.message.reply_text("Aucun match trouvé dans la réponse de l'API.")
-        return
+    for match in data["matches"]:
+        home = match["homeTeam"]["name"]
+        away = match["awayTeam"]["name"]
+        competition = match["competition"]["name"]
 
-    # Filtrer par league_id et date future
-    now = datetime.utcnow()
-    upcoming = []
-    for f in fixtures:
-        try:
-            # SportMonks peut renvoyer league_id directement ou dans une clé imbriquée
-            lid = f.get("league_id") or (f.get("league") or {}).get("data", {}).get("id")
-            # différentes clés possibles pour la date selon la version de l'API
-            start = f.get("starting_at") or f.get("starting_at") or f.get("time") or f.get("fixture", {}).get("date")
-            if not start:
-                continue
-            # Garder seulement les matchs du bon championnat
-            if str(lid) != str(league_id):
-                continue
-            # ajouter à la liste (on affiche la date brute telle quelle)
-            upcoming.append((start, f))
-        except Exception:
-            continue
+        # 🧠 Générer une prédiction basique
+        prediction = predict(home,away)
 
-    if not upcoming:
-        await update.message.reply_text("Aucun match futur trouvé pour ce championnat (vérifie l'ID/saison).")
-        return
+        message += f"🏆 {competition}\n"
+        message += f"⚔️ {home} vs {away}\n"
+        message += f"🔮 *Prédiction* : {prediction}\n\n"
 
-    # Trier par date et prendre les 5 premiers
-    upcoming.sort(key=lambda x: x[0])
-    upcoming = upcoming[:5]
-
-    message = f"📅 Prochains matchs de {league_name.title()} :\n\n"
-    for start, f in upcoming:
-        # Plusieurs formats possibles selon le payload de SportMonks
-        home = (f.get("localTeam", {}) .get("data", {}) .get("name")
-                or f.get("home_team_name") or f.get("homeTeam", {}).get("data", {}).get("name")
-                or "Domicile")
-        away = (f.get("visitorTeam", {}).get("data", {}).get("name")
-                or f.get("away_team_name") or f.get("awayTeam", {}).get("data", {}).get("name")
-                or "Extérieur")
-        # état du match (si disponible)
-        status_match = None
-        if isinstance(f.get("time"), dict):
-            status_match = f["time"].get("status")
-        elif f.get("status"):
-            status_match = f.get("status")
-
-        message += f"⚽ {home} vs {away} — {start}"
-        if status_match:
-            message += f" ({status_match})"
-        message += "\n"
-
-    await update.message.reply_text(message)
+    await update.message.reply_text(message, parse_mode="Markdown")
     
 async def main():
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
