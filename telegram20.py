@@ -327,7 +327,7 @@ async def met(city):
             "Temperature":data["main"]["temp"],
             "Humidite":data["main"]["humidity"],
             "Description":data["weather"][0]["description"],
-            "date":datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "date":datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         with open("meteo.json","a",encoding="utf-8") as f:
             f.write(json.dumps(meteo,ensure_ascii=False) + "\n")
@@ -336,7 +336,7 @@ async def met(city):
     else :
         return "❌ Erreur lors de la recuperation : "
 
-async def meteo(update, context):
+async def meteo(update,context):
     if not context.args:
         await update.message.reply_text("Utilisation : /meteo <Nom de la ville>")
         return
