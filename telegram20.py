@@ -58,7 +58,7 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def ping(update,context):
-    await update.message.reply_text("🤖 MACHINE BOT \n 🏓 Pong! Je suis en ligne ✅")
+    await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
 
 async def start(update,context):
     user = update.message.from_user
