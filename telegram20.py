@@ -114,6 +114,8 @@ async def start(update,context):
     await update.message.reply_text(text, parse_mode="Markdown", reply_markup=reply_markup)
 
 async def about(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     text = (
         "╔════════════════════════════╗\n"
         "     🤖 *Machine_11bot* 🤖\n"
@@ -177,6 +179,8 @@ async def help_command(update,context):
     )
 
 async def add(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     try:
         n1 = float(context.args[0])
         n2 = float(context.args[1])
@@ -186,6 +190,8 @@ async def add(update,context):
         await update.message.reply_text("Usage : /app 'nombre1' 'nombre2'")
 
 async def sub(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     try:
         n1 = float(context.args[0])
         n2 = float(context.args[1])
@@ -195,6 +201,8 @@ async def sub(update,context):
         await update.message.reply_text("Usage : /sub 'nombre1' 'nombre2'")
 
 async def mul(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     try:
         n1 = float(context.args[0])
         n2 = float(context.args[1])
@@ -204,6 +212,8 @@ async def mul(update,context):
         await update.message.reply_text("Usage : /mul 'nombre1' 'nombre2'")
 
 async def div(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     try:
         n1 = float(context.args[0])
         n2 = float(context.args[1])
@@ -216,6 +226,8 @@ async def div(update,context):
         await update.message.reply_text("Usage : /div 'nombre1' 'nombre2'")
         
 async def mod(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     try:
         n1 = int(context.args[0])
         n2 = int(context.args[1])
@@ -243,6 +255,9 @@ async def gen_phrase(update,context):
     await update.message.reply_text(phrase)
 
 async def pin(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
+    
     code = "".join([str(random.randint(0, 9)) for _ in range(4)])
     await update.message.reply_text(f"🔑 Ton code PIN : {code}")
     print("Un code PIN a été generer")
@@ -294,6 +309,8 @@ async def msg(update,context):
         await update.message.reply_text("❌ Utilisation : /msg 'chat_id' 'texte'")
 
 async def ask(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     question = " ".join(context.args)
     sender = update.message.from_user.first_name
     print(f"Le client {sender} a poser cette question au bot : {question}")
@@ -431,6 +448,8 @@ async def send_online(app):
             print(f"Erreur en envoyant à {chat_id}: {e}")
             
 async def auto_reply(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     bot_username = context.bot.username.lower()
     text = update.message.text.lower()
     sender = update.message.from_user.first_name
@@ -652,6 +671,8 @@ async def analyse_comments(comments):
 
 
 async def youtube_se(update,context):
+    await update.message.chat.send_action(action="typing")
+    await asyncio.sleep(3)
     if not context.args :
         await update.message.reply_text("Utilisation correcte /video <nom de la video a rechercher>")
         return 
@@ -915,7 +936,7 @@ async def football(update,context):
 
         # 1️⃣ Match terminé
         if status in ["FINISHED", "AWARDED"]:
-            message += f"🏁 {home} {home_score} - {away_score} {away} (le {match_date})\n\n"
+            message += f"Termine🏁 {home} {home_score} - {away_score} {away} (le {match_date})\n\n"
 
         # 2️⃣ Match en cours
         elif status == "LIVE":
@@ -941,7 +962,7 @@ async def football(update,context):
                 home_form or 0, away_form or 0,
                 home_goals or 0, away_goals or 0
             )
-            message += f"⏰ {home} vs {away} (prévu le {match_date})\n🔮 {prediction}\n\n"
+            message += f"⚽ {home} vs {away} (prévu le {match_date})\n🔮 {prediction}\n\n"
 
     await update.message.reply_text(message, parse_mode="Markdown")
 
