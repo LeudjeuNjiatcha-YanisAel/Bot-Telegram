@@ -856,12 +856,17 @@ def predict_match(home_rank, away_rank, home_form, away_form, home_goals, away_g
 
 # ---- Commande Telegram ----
 async def football(update,context):
+    await update.message.reply_text("Recherche des matchs en cours et à venir... ⏳")
+    await asyncio.sleep(3)
+    
     if not context.args:
+        # Afficher la liste des championnats disponibles
+        ligues_dispo = "\n".join([f"- {nom.title()}" for nom in leagues.keys()])
         await update.message.reply_text(
             "Utilisation : /football <nom du championnat>\n"
-            "Exemples : /football premier league, /football can"
+            "Exemples : /football premier league, /football can\n\n"
+            "🏆 Championnats disponibles :\n" + ligues_dispo
         )
-        return
 
     league_name = " ".join(context.args).lower()
     league_id = leagues.get(league_name)
