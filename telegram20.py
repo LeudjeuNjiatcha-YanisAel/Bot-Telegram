@@ -58,7 +58,7 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def ping(update,context):
-    await update.message.reply_text("Pong! 🤖 MACHINE BOT est en ligne ✅")
+    await update.message.reply_text("🏓 Pong! 🤖 MACHINE BOT est en ligne ✅")
 
 async def start(update,context):
     user = update.message.from_user
@@ -300,21 +300,22 @@ async def ask(update,context):
     if not question:
         await update.message.reply_text("❌ Utilisation : /ask <ta question>")
         return
+    async def thread():
+        try:
+            client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
 
-    try:
-        client = genai.Client(api_key="AIzaSyBXylzIdR5bMdb9NwtywO-MgJB1V134548")
+            response = client.models.generate_content(
+                model="gemini-2.5-pro",
+                contents=question
+            )
 
-        response = client.models.generate_content(
-            model="gemini-2.5-pro",
-            contents=question
-        )
-
-        answer = response.text
-        for i in range(0,len(answer),2000) :
-            await update.message.reply_text("Machine_IA🤖 \n ")
-            await update.message.reply_text("💡 Réponse : "+answer[i:i+4096])
-    except Exception as e:
-        await update.message.reply_text(f"⚠️ Machine IA : {e}")
+            answer = response.text
+            for i in range(0,len(answer),2000) :
+                await update.message.reply_text("Machine_IA🤖 \n ")
+                await update.message.reply_text("💡 Réponse : "+answer[i:i+4096])
+        except Exception as e:
+            await update.message.reply_text(f"⚠️ Machine IA : {e}")
+    asyncio.create_task(thread())
 
 async def met(city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={METEO_API}&units=metric&lang=fr"
@@ -419,10 +420,13 @@ async def clear(update,context):
             await update.message.reply_text("❌ Impossible de nettoyer (le bot doit être admin et avoir la permission de suppression)")
 
 async def send_online(app):
+    tasks = []
     for chat_id in users.keys():
         try:
             print("Message envoye ! ✅")
-            await app.bot.send_message(chat_id=int(chat_id),text="🤖 Le bot est en ligne ✅")
+            task = asyncio.create_task(await app.bot.send_message(chat_id=int(chat_id),text="🤖 Le bot est en ligne ✅"))
+            tasks.append(task)
+            await asyncio.gather(*tasks,return_exceptions=True)
         except Exception as e:
             print(f"Erreur en envoyant à {chat_id}: {e}")
             
@@ -1019,7 +1023,7 @@ if __name__ == "__main__":
     print("Machine_Bot a démarré...")
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
-    app.run_polling()
+    asyncio.run(main())
 
    
 
