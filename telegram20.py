@@ -1,7 +1,7 @@
 import random
 from random import shuffle
 import datetime
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime
 import asyncio
 import json
 import os
@@ -409,12 +409,12 @@ async def clear(update,context):
 
     if chat.type in ["group","supergroup"]:
         try:
-            for i in range(message_id,message_id-250,-1):
+            for i in range(message_id,message_id-10,-1):
                 try:
                    await context.bot.delete_message(chat_id=chat_id,message_id=i)
                 except:
                     pass
-            await update.message.reply_text("✅ 50 derniers messages supprimés")
+            await update.message.reply_text("✅ 10 derniers messages supprimés")
         except:
             await update.message.reply_text("❌ Impossible de nettoyer (le bot doit être admin et avoir la permission de suppression)")
 
