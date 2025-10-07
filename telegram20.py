@@ -99,6 +99,7 @@ async def start(update,context):
         "📰 /news sujet → Rechercher des actualités\n"
         "🌦 /meteo ville → Météo locale\n"
         "   /pp → Recupere La Photo de profil\n"
+        "   /squidgame → Demarrer Un Jeu"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
@@ -117,9 +118,9 @@ async def about(update,context):
     await update.message.chat.send_action(action="typing")
     await asyncio.sleep(3)
     text = (
-        "╔════════════════════════════╗\n"
+        "╔════════════════════════════╗          \n"
         "     🤖 *Machine_11bot* 🤖\n"
-        "╚════════════════════════════╝\n\n"
+        "╚════════════════════════════╝           \n\n"
         "✨ *Version* : `20.6`\n"
         "💫 *Technologies* :\n"
         "   🥇 Python3\n"
@@ -168,6 +169,8 @@ async def help_command(update,context):
         "/video nom de la video → Rechercher une video\n"
         "/news sujet → Rechercher des actualités\n"
         "/pp → Recupere La Photo de profil\n"
+        "/sticker → Transforme une photo en stickers\n"
+        "/squidgame → Demarrer Un Jeu\n"
         "/meteo ville → Météo locale\n"
         "/ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -416,6 +419,8 @@ async def getid(update,context):
     await update.message.reply_text(f"Ton chat_id est : {chat_id}")
 
 async def clear(update,context):
+    id = update.message.from_user.id
+    owner = 5441882239
     chat = update.message.chat
     chat_id = chat.id
     message_id = update.message.message_id
@@ -424,7 +429,10 @@ async def clear(update,context):
         empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
-
+    if id != owner:
+        await update.message.reply_text("Permission Non Accorder Pour Cette Commande")
+        return
+    
     if chat.type in ["group","supergroup"]:
         try:
             for i in range(message_id,message_id-10,-1):
@@ -757,7 +765,7 @@ async def play(update,context):
     except Exception as e:
         await update.message.reply_text(f"Erreur : {e}")        
 
-def call_news(category_or_keyword="general", max_results=5):
+def call_news(category_or_keyword="general",max_results=5):
     """
     Récupère soit une catégorie de news, soit une recherche par mot-clé,
     avec titre, résumé et URL.
@@ -863,6 +871,9 @@ async def sticker(update,context):
     
     #envoie du sticker
     await update.message.reply_sticker(sticker=output)
+    
+async def squidgame(update,context):
+    await update.message.reply_text("Cette fonction est en cours de mise a jour ... ⏳")
 
 # ---- Fonction utilitaire pour prédiction ----
 def predict_match(home_rank, away_rank, home_form, away_form, home_goals, away_goals):
@@ -991,6 +1002,7 @@ async def main():
     app.add_handler(CommandHandler("pp",pp))
     app.add_handler(CommandHandler("sticker",sticker))
     app.add_handler(CommandHandler("google",open_google))
+    app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
@@ -1034,6 +1046,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("pp",pp))
     app.add_handler(CommandHandler("sticker",sticker))
     app.add_handler(CommandHandler("google",open_google))
+    app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
