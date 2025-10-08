@@ -121,9 +121,9 @@ async def squidgame(update,context):
     await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮")
     await update.message.reply_text(f"Joueur N°{number}")
     await update.message.reply_text("Jeux Disponibles :")
-    await update.message.reply_text(f"1.    dice    Joueurs en ligne ({nc})")
-    await update.message.reply_text(f"2.    piece   Joueurs en ligne ({nt})")
-    await update.message.reply_text(f"3.    chefumi Joueurs en ligne ({nr})")
+    await update.message.reply_text(f"1.dice    Joueurs en ligne ({nc})")
+    await update.message.reply_text(f"2.piece   Joueurs en ligne ({nt})")
+    await update.message.reply_text(f"3.chefumi Joueurs en ligne ({nr})")
     await update.message.reply_text(" 4. ❌ Quitter la partie (/quit)")
     await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
 
@@ -1004,7 +1004,7 @@ async def football(update,context):
     )
     response = requests.get(url, headers=headers)
     data = response.json()
-    await update.message.reply_text(f"✅ {data.get('count', 0)} matchs trouvés.")
+    await update.message.reply_text(f"data: {data}")  # Debug: afficher la réponse brute
     if "matches" not in data or not data["matches"]:
         await update.message.reply_text("Aucun match prévu ou joué pour cette période.")
         return
