@@ -57,6 +57,10 @@ def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
+async def dice(update,context):
+    result = random.randint(1,6)
+    await update.message.reply_text(f"🎲 Le dé a roulé et a donné : {result}")
+
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
 
@@ -1048,6 +1052,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
+    app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
