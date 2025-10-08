@@ -73,7 +73,7 @@ async def dice(update,context):
     
 async def piece(update,context):
     await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
-    result = random.randint(["pile","face"])
+    result = random.choice(["pile","face"])
     await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
     nc = nc + 1
     return nc
@@ -116,13 +116,13 @@ async def squidgame(update,context):
     global user_numbers, nc, nt, nr
     user = update.message.from_user.id
     if user not in user_numbers:
-        number = random.randint(1, 456)
+        number = random.randint(1,456)
         user_numbers[user] = number
     else:
         number = user_numbers[user]
 
     await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮")
-    await update.message.reply_text(f"Joueur numéro {number}")
+    await update.message.reply_text(f"Joueur N°{number}")
     await update.message.reply_text(f"1. ◻️ Carré    Joueurs en ligne ({nc})")
     await update.message.reply_text(f"2. 🔺 Triangle Joueurs en ligne ({nt})")
     await update.message.reply_text(f"3. ⭕ Rond     Joueurs en ligne ({nr})")
@@ -133,6 +133,9 @@ async def quit(update,context):
     user = update.message.from_user.id
     await update.message.reply_text(f"Vous avez quitter la partie joueur N°{user_numbers[user]} ")
     user_numbers.clear()
+    nc = 0
+    nt = 0
+    nr = 0 
 async def carre(update,context):
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
