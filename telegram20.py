@@ -87,8 +87,8 @@ async def squidgame(update,context):
     except:
         await update.message.reply_text("Usage : /nom de la figure ")
 
-dice_results = dice()
-piece_results = piece ()
+dice_results = dice(update,context)
+piece_results = piece (update,context)
 async def carre(update,context):
     result = random.choice([dice_results,piece_results])
     await update.message.reply_text(f"Vous avez choisi Carre ◻️ \n Vous avez obtenu : {result}")
