@@ -86,6 +86,7 @@ async def squidgame(update,context):
     
 async def carre(update,context):
     result = random.choice(dice,piece)
+    await update.message.reply_text(f"Vous avez choisi Carre ◻️ \n Vous avez obtenu : {result}")
 
 async def triangle(update,context):
     result = random.choice(chefumi)
