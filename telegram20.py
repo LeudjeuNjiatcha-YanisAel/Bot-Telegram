@@ -61,18 +61,21 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
+    await update.message.reply_text("Vous Avez ete affecte sur le jeu de")
     result = random.randint(1,6)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : {result}")
     nc = nc + 1
     
 async def piece(update,context):
+    await update.message.reply_text("Vous Avez ete affecte sur le jeu pile ou face")
     result = random.randint("pile","face")
     await update.message.reply_text(f"📀️ tu as obtenu : {result}")
+    nc = nc + 1
 async def chefumi(update,context):
    await update.message.reply_text("Veuillez Choisir Ciseau ✂️, Pierre 🔨 , Feuille 📝️") 
     
 async def squidgame(update,context):
-    await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️")
+    await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️ \t")
     number = random.randint(1,456)
     await update.message.reply_text(f"Joueur Numero {number}")
     await update.message.reply_text(f"1.◻️ Carre  (Joueur en ligne ({nc}))")
@@ -83,9 +86,11 @@ async def squidgame(update,context):
         await update.message.reply_text("Veuillez Choisir une figure avec /nom de la figure\n Exemple : /carre ou /rond ")    
     except:
         await update.message.reply_text("Usage : /nom de la figure ")
-    
+
+dice_results = dice()
+piece_results = piece ()
 async def carre(update,context):
-    result = random.choice(dice,piece)
+    result = random.choice([dice_results,piece_results])
     await update.message.reply_text(f"Vous avez choisi Carre ◻️ \n Vous avez obtenu : {result}")
 
 async def triangle(update,context):
