@@ -1008,6 +1008,7 @@ async def main():
     app.add_handler(CommandHandler("google",open_google))
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
+    app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
