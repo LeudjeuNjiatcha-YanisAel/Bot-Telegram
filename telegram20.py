@@ -57,16 +57,18 @@ if os.path.exists(USERS_FILE):
 nc = 0
 nt = 0
 nr = 0 
+
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
+    global nc
     await update.message.reply_text("Vous Avez ete affecte sur le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
     await asyncio.sleep(2)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
-    nc = nc + 1
+    nc +=1
     return nc
     
 async def piece(update,context):
@@ -78,14 +80,17 @@ async def piece(update,context):
 
 async def chefumi(update,context):
     await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
+    if not context.args:
+        await update.message.reply_text("⚠️ Usage : /chefumi <ton choix>")
+        return
     choix = " ".join(context.args).lower()
     await update.message.reply_text("Pierre ...")
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
     await update.message.reply_text("Feuille ...")
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
     await update.message.reply_text("Ciseau ...")
-    await asyncio.sleep(2)
-    result = random.randint("ciseau","pierre","feuille")
+    await asyncio.sleep(1)
+    result = random.choice(["ciseau","pierre","feuille"])
     await update.message.reply_text(f"J'ai tire {result} et toi {choix} ")
     if result == "ciseau" and choix == "ciseau":
         await update.message.reply_text("😌️ Partie Nulle")
@@ -108,21 +113,21 @@ async def chefumi(update,context):
        
         
 async def squidgame(update,context):
+    global user_numbers, nc, nt, nr
     user = update.message.from_user.id
     if user not in user_numbers:
-        number = random.randint(1,456)
+        number = random.randint(1, 456)
         user_numbers[user] = number
-        save_users()
-    await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️ \t")
-    await update.message.reply_text(f"Joueur Numero {number}")
-    await update.message.reply_text(f"1.◻️ Carre    Joueur en ligne ({nc})")
-    await update.message.reply_text(f"2.🔺️ Triangle Joueur en ligne ({nt})")
-    await update.message.reply_text(f"3.⭕️ Rond     Joueur en ligne ({nr})")
-    await update.message.reply_text(" 4.❌️ Quitter la partie(Taper quit)")
-    try :
-        await update.message.reply_text("Choisir une figure \n/carre\n/rond\n/triangle")    
-    except:
-        await update.message.reply_text("Usage : /nom de la figure ")
+    else:
+        number = user_numbers[user]
+
+    await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮")
+    await update.message.reply_text(f"Joueur numéro {number}")
+    await update.message.reply_text(f"1. ◻️ Carré    Joueurs en ligne ({nc})")
+    await update.message.reply_text(f"2. 🔺 Triangle Joueurs en ligne ({nt})")
+    await update.message.reply_text(f"3. ⭕ Rond     Joueurs en ligne ({nr})")
+    await update.message.reply_text(" 4. ❌ Quitter la partie (/quit)")
+    await update.message.reply_text("Choisis une figure : /carre\n/triangle\n/rond")
 
 async def quit(update,context):
     user = update.message.from_user.id
@@ -131,7 +136,7 @@ async def quit(update,context):
 async def carre(update,context):
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
-    result = random.randint(dice_results,piece_results)
+    result = random.choice([dice_results,piece_results])
     await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
 
 async def triangle(update,context):
