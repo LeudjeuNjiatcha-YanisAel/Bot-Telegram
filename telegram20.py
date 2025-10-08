@@ -27,7 +27,7 @@ URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token":FOOTBALL}
 
 google_news = GNews(language='fr',country='FR',period='7d',max_results=5)
-
+CHOIX = range(1)
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
