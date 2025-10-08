@@ -86,7 +86,7 @@ async def chefumi(update,context):
     
     if player not in choice:
         await update.message.reply_text("⚠️ Usage : Tape pierre,feuille ou ciseau")
-        return
+        return CHOIX
     
     result = random.choice(["ciseau","pierre","feuille"])
     
@@ -1095,7 +1095,12 @@ async def main():
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("carre",carre))
-    app.add_handler(CommandHandler("triangle",triangle))
+    triangle = ConversationHandler(
+        entry_points=[CommandHandler("triangle",triangle)],
+        states={
+            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)],
+        })
+    app.add_handler(triangle)
     app.add_handler(CommandHandler("she",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
@@ -1133,6 +1138,12 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("msg",msg))
     app.add_handler(CommandHandler("send",send))
     app.add_handler(CommandHandler("about",about))
+    triangle = ConversationHandler(
+        entry_points=[CommandHandler("triangle",triangle)],
+        states={
+            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)],
+        })
+    app.add_handler(triangle)
     app.add_handler(CommandHandler("listusers",listusers))
     app.add_handler(CommandHandler("getid",getid))
     app.add_handler(CommandHandler("time",time))
