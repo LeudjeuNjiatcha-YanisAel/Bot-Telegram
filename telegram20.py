@@ -71,7 +71,7 @@ async def dice(update,context):
     
 async def piece(update,context):
     await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
-    result = random.choice(["pile","face"])
+    result = random.randint(["pile","face"])
     await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
     nc = nc + 1
     return nc
