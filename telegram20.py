@@ -78,7 +78,11 @@ async def squidgame(update,context):
     await update.message.reply_text(f"1.◻️ Carre  (Joueur en ligne ({nc}))")
     await update.message.reply_text(f"2.🔺️ Triangle (Joueur en ligne ({nt}))")
     await update.message.reply_text(f"3.⭕️ Rond (Joueur en ligne ({nr}))")
-    await update.message.reply_text("Cette fonction est en cours de mise a jour ... ⏳")
+    
+    try :
+        await update.message.reply_text("Veuillez Choisir une figure avec /nom de la figure\n Exemple : /carre ou /rond ")    
+    except:
+        await update.message.reply_text("Usage : /nom de la figure ")
     
 async def carre(update,context):
     result = random.choice(dice,piece)
@@ -1031,6 +1035,8 @@ async def main():
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
+    app.add_handler(CommandHandler("carre",carre))
+    app.add_handler(CommandHandler("triangle",triangle))
     app.add_handler(CommandHandler("she",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
@@ -1078,6 +1084,8 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
+    app.add_handler(CommandHandler("carre",carre))
+    app.add_handler(CommandHandler("triangle",triangle))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
