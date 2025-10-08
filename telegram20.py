@@ -71,7 +71,7 @@ async def dice(update,context):
     
 async def piece(update,context):
     await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
-    result = random.randint("pile","face")
+    result = random.choice(["pile","face"])
     await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
     nc = nc + 1
     return nc
@@ -126,7 +126,7 @@ async def squidgame(update,context):
 
 async def quit(update,context):
     user = update.message.from_user.id
-    await update.message.reply_text(f"Vous avez quitter la partie joueur {user_numbers[user]} ")
+    await update.message.reply_text(f"Vous avez quitter la partie joueur N°{user_numbers[user]} ")
     user_numbers.clear()
 async def carre(update,context):
     dice_results = await dice(update,context)
@@ -1093,6 +1093,7 @@ async def main():
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
+    app.add_handler(CommandHandler("quit",quit))
     app.add_handler(CommandHandler("meteo",meteo))
    
     print("Machine_Bot a démarré...")
@@ -1140,6 +1141,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
+    app.add_handler(CommandHandler("quit",quit))
     app.add_handler(CommandHandler("meteo",meteo))
     
     # Lancement du bot
