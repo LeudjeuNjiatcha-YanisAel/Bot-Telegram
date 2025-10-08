@@ -31,6 +31,7 @@ google_news = GNews(language='fr',country='FR',period='7d',max_results=5)
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
+user_numbers = {}
 
 # ---- Dictionnaire ligues et sélections ----
 leagues = {
@@ -71,7 +72,7 @@ async def dice(update,context):
 async def piece(update,context):
     await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
     result = random.randint("pile","face")
-    await update.message.reply_text(f"📀️ tu as obtenu : **{result}**",parse_mode = "Markdown")
+    await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
     nc = nc + 1
     return nc
 
@@ -107,9 +108,12 @@ async def chefumi(update,context):
        
         
 async def squidgame(update,context):
-    await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️ \t")
     user = update.message.from_user.id
-    number = random.randint(1,456)
+    if user not in user_numbers:
+        number = random.randint(1,456)
+        user_numbers[user] = number
+        save_users()
+    await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️ \t")
     await update.message.reply_text(f"Joueur Numero {number}")
     await update.message.reply_text(f"1.◻️ Carre    Joueur en ligne ({nc})")
     await update.message.reply_text(f"2.🔺️ Triangle Joueur en ligne ({nt})")
