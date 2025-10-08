@@ -61,9 +61,10 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
-    await update.message.reply_text("Vous Avez ete affecte sur le *Jeu Tire un de*",parse_mode="Markdown")
+    await update.message.reply_text("Vous Avez ete affecte sur le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
-    await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : {result}")
+    await asyncio.sleep(2)
+    await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
     nc = nc + 1
     return nc
     
@@ -75,7 +76,7 @@ async def piece(update,context):
     return nc
 
 async def chefumi(update,context):
-    await update.message.reply_text("Veuillez Choisir Ciseau ✂️, Pierre 🔨 , Feuille 📝️")
+    await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
     choix = " ".join(context.args).lower()
     await update.message.reply_text("Pierre ...")
     await asyncio.sleep(2)
@@ -110,9 +111,9 @@ async def squidgame(update,context):
     user = update.message.from_user.id
     number = random.randint(1,456)
     await update.message.reply_text(f"Joueur Numero {number}")
-    await update.message.reply_text(f"1.◻️ Carre     Joueur en ligne ({nc})")
-    await update.message.reply_text(f"2.🔺️ Triangle  Joueur en ligne ({nt})")
-    await update.message.reply_text(f"3.⭕️ Rond      Joueur en ligne ({nr})")
+    await update.message.reply_text(f"1.◻️ Carre    Joueur en ligne ({nc})")
+    await update.message.reply_text(f"2.🔺️ Triangle Joueur en ligne ({nt})")
+    await update.message.reply_text(f"3.⭕️ Rond     Joueur en ligne ({nr})")
     
     try :
         await update.message.reply_text("Choisir une figure \n/carre\n/rond\n/triangle")    
@@ -135,7 +136,7 @@ async def triangle(update,context):
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
 
-async def start(update,context):
+async def start(update,context):  
     user = update.message.from_user
     users[str(user.id)] = {
         "first_name": user.first_name,
