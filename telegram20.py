@@ -108,6 +108,9 @@ async def chefumi(update,context):
         await update.message.reply_text("❌️ Tu as perdu")
     nt +=1
     return ConversationHandler.END
+async def cancel(update,context):
+    await update.message.reply_text("Jeu annulée.")
+    return ConversationHandler.END
         
 async def squidgame(update,context):
     global user_numbers, nc, nt, nr
@@ -146,6 +149,7 @@ async def triangle(update,context):
     chefumi_result = await chefumi(update,context)
     result = random.randint(chefumi_result)
     await update.message.reply_text(f"Vous avez tirez le Triangle 🔺️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
+    return
   
     
 async def ping(update,context):
@@ -1095,12 +1099,12 @@ async def main():
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("carre",carre))
-    triangle = ConversationHandler(
+    triangle_c = ConversationHandler(
         entry_points=[CommandHandler("triangle",triangle)],
         states={
-            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)],
-        })
-    app.add_handler(triangle)
+            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
+        fallbacks=[CommandHandler("cancel",cancel)])
+    app.add_handler(triangle_c)
     app.add_handler(CommandHandler("she",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
