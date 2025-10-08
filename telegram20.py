@@ -65,17 +65,49 @@ async def dice(update,context):
     result = random.randint(1,6)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : {result}")
     nc = nc + 1
+    return nc
     
 async def piece(update,context):
-    await update.message.reply_text("Vous Avez ete affecte sur le jeu pile ou face")
+    await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
     result = random.randint("pile","face")
-    await update.message.reply_text(f"📀️ tu as obtenu : {result}")
+    await update.message.reply_text(f"📀️ tu as obtenu : **{result}**",parse_mode = "Markdown")
     nc = nc + 1
+    return nc
+
 async def chefumi(update,context):
-   await update.message.reply_text("Veuillez Choisir Ciseau ✂️, Pierre 🔨 , Feuille 📝️") 
-    
+    await update.message.reply_text("Veuillez Choisir Ciseau ✂️, Pierre 🔨 , Feuille 📝️")
+    choix = " ".join(context.args).lower()
+    await update.message.reply_text("Pierre ...")
+    await asyncio.sleep(2)
+    await update.message.reply_text("Feuille ...")
+    await asyncio.sleep(2)
+    await update.message.reply_text("Ciseau ...")
+    await asyncio.sleep(2)
+    result = random.randint("ciseau","pierre","feuille")
+    await update.message.reply_text(f"J'ai tire {result} et toi {choix} ")
+    if result == "ciseau" and choix == "ciseau":
+        await update.message.reply_text("😌️ Partie Nulle")
+    if result == "ciseau" and choix == "feuille":
+        await update.message.reply_text("❌️ Tu as perdu")
+    if result == "ciseau" and choix == "pierre":
+        await update.message.reply_text("✅ Tu as gagne ")
+    if result == "feuille" and choix == "ciseau":
+        await update.message.reply_text("✅ Tu as gagne ")
+    if result == "feuille" and choix == "pierre":
+        await update.message.reply_text("❌️ Tu as perdu ")
+    if result == "feuille" and choix == "feuille":
+        await update.message.reply_text("😌️ Partie Nulle ")
+    if result == "pierre" and choix == "ciseau":
+        await update.message.reply_text("❌️ Tu as perdu")
+    if result == "pierre" and choix == "feuille":
+        await update.message.reply_text("✅ Tu as gagne ")
+    if result == "pierre" and choix == "pierre":
+        await update.message.reply_text("😌️ Partie Nulle ")
+       
+        
 async def squidgame(update,context):
     await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️ \t")
+    user = update.message.from_user.id
     number = random.randint(1,456)
     await update.message.reply_text(f"Joueur Numero {number}")
     await update.message.reply_text(f"1.◻️ Carre     Joueur en ligne ({nc})")
@@ -92,10 +124,13 @@ async def carre(update,context):
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
     result = random.randint(dice_results,piece_results)
-    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
+    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
 
 async def triangle(update,context):
-    result = random.choice(chefumi)
+    chefumi_result = await chefumi(update,context)
+    result = random.randint(chefumi_result)
+    await update.message.reply_text(f"Vous avez tirez le Triangle 🔺️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
+    
     
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
@@ -138,7 +173,7 @@ async def start(update,context):
         "▶️ /video nom de la video → Rechercher une video\n"
         "📰 /news sujet → Rechercher des actualités\n"
         "🌦 /meteo ville → Météo locale\n"
-        "   /pp → Recupere La Photo de profil\n"
+        "📷️ /pp → Recupere La Photo de profil\n"
         "🎮️ /squidgame → Demarrer Un Jeu"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
