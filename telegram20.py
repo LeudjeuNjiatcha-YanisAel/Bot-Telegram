@@ -146,8 +146,9 @@ async def carre(update,context):
     piece_results = await piece(update,context)
     result = random.choice([dice_results,piece_results])
     if result == dice_results : 
-    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
-    
+        await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
+    if result == piece_results :
+        await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
 
 async def triangle(update,context):
     chefumi_result = await chefumi(update,context)
