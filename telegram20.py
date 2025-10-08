@@ -1142,11 +1142,12 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("msg",msg))
     app.add_handler(CommandHandler("send",send))
     app.add_handler(CommandHandler("about",about))
-    triangle = ConversationHandler(
+    triangle_c = ConversationHandler(
         entry_points=[CommandHandler("triangle",triangle)],
         states={
-            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)],
-        })
+            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
+        fallbacks=[CommandHandler("cancel",cancel)])
+    app.add_handler(triangle_c)
     app.add_handler(triangle)
     app.add_handler(CommandHandler("listusers",listusers))
     app.add_handler(CommandHandler("getid",getid))
