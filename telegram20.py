@@ -501,7 +501,7 @@ async def getid(update,context):
 async def clear(update,context):
     id = update.message.from_user.id
     owner = 5441882239
-    owner1 = 7799721970
+    own = 7799721970
     chat = update.message.chat
     chat_id = chat.id
     message_id = update.message.message_id
@@ -510,7 +510,7 @@ async def clear(update,context):
         empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
-    if id != owner and id != owner1:
+    if id != owner or id != own:
         await update.message.reply_text("❌️ Permission Non Accorder Pour Cette Commande")
         return
     
