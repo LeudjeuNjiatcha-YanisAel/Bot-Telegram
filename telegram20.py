@@ -78,21 +78,21 @@ async def squidgame(update,context):
     await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️ \t")
     number = random.randint(1,456)
     await update.message.reply_text(f"Joueur Numero {number}")
-    await update.message.reply_text(f"1.◻️ Carre  (Joueur en ligne ({nc}))")
-    await update.message.reply_text(f"2.🔺️ Triangle (Joueur en ligne ({nt}))")
-    await update.message.reply_text(f"3.⭕️ Rond (Joueur en ligne ({nr}))")
+    await update.message.reply_text(f"1.◻️ Carre     Joueur en ligne ({nc})")
+    await update.message.reply_text(f"2.🔺️ Triangle  Joueur en ligne ({nt})")
+    await update.message.reply_text(f"3.⭕️ Rond      Joueur en ligne ({nr})")
     
     try :
-        await update.message.reply_text("Veuillez Choisir une figure avec /nom de la figure\n Exemple : /carre ou /rond ")    
+        await update.message.reply_text("Choisir une figure \n/carre\n/rond\n/triangle")    
     except:
         await update.message.reply_text("Usage : /nom de la figure ")
 
 
 async def carre(update,context):
-    dice_results = dice(update,context)
-    piece_results = piece (update,context)
+    dice_results = await dice(update,context)
+    piece_results = await piece(update,context)
     result = random.choice([dice_results,piece_results])
-    await update.message.reply_text(f"Vous avez choisi Carre ◻️ \n Vous avez obtenu : {result}")
+    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : {result}")
 
 async def triangle(update,context):
     result = random.choice(chefumi)
