@@ -118,13 +118,16 @@ async def squidgame(update,context):
     await update.message.reply_text(f"1.◻️ Carre    Joueur en ligne ({nc})")
     await update.message.reply_text(f"2.🔺️ Triangle Joueur en ligne ({nt})")
     await update.message.reply_text(f"3.⭕️ Rond     Joueur en ligne ({nr})")
-    
+    await update.message.reply_text(" 4.❌️ Quitter la partie(Taper quit)")
     try :
         await update.message.reply_text("Choisir une figure \n/carre\n/rond\n/triangle")    
     except:
         await update.message.reply_text("Usage : /nom de la figure ")
 
-
+async def quit(update,context):
+    user = update.message.from_user.id
+    await update.message.reply_text(f"Vous avez quitter la partie joueur {user_numbers[user]} ")
+    user_numbers.clear()
 async def carre(update,context):
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
@@ -510,7 +513,7 @@ async def clear(update,context):
         empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
-    if id != owner or id != own:
+    if id != owner or own:
         await update.message.reply_text("❌️ Permission Non Accorder Pour Cette Commande")
         return
     
