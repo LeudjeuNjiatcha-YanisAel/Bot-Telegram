@@ -130,6 +130,7 @@ async def squidgame(update,context):
     await update.message.reply_text("Choisis une figure : /carre\n/triangle\n/rond")
 
 async def quit(update,context):
+    global nc,nt,nr
     user = update.message.from_user.id
     if user in user_numbers:
         await update.message.reply_text(f"Vous avez quitté la partie, joueur N°{user_numbers[user]}")
@@ -140,10 +141,13 @@ async def quit(update,context):
     else:
         await update.message.reply_text("Vous n'êtes pas encore dans la partie.")
 async def carre(update,context):
+    global nc
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
     result = random.choice([dice_results,piece_results])
-    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
+    if result == dice_results : 
+    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
+    
 
 async def triangle(update,context):
     chefumi_result = await chefumi(update,context)
