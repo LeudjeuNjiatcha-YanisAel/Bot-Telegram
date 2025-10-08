@@ -15,7 +15,7 @@ from googleapiclient.discovery import build
 from google.genai import types 
 from google import genai
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder,CommandHandler,MessageHandler,filters,ContextTypes
+from telegram.ext import ApplicationBuilder,CommandHandler,MessageHandler,ConversationHandler,filters,ContextTypes
 
 TOKEN = "8404081837:AAF9lT_adIUY8ou8LPfdUDXNqqE6DDe86K0"
 USERS_FILE = "users.json"
@@ -79,38 +79,35 @@ async def piece(update,context):
     return nc
 
 async def chefumi(update,context):
+    global nt
     await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
-    if not context.args:
-        await update.message.reply_text("⚠️ Usage : /chefumi <ton choix>")
+    player = update.message.text.lower()
+    choice = ["pierre","feuille","ciseau"]
+    
+    if player not in choice:
+        await update.message.reply_text("⚠️ Usage : Tape pierre,feuille ou ciseau")
         return
-    choix = " ".join(context.args).lower()
+    
+    result = random.choice(["ciseau","pierre","feuille"])
+    
     await update.message.reply_text("Pierre ...")
     await asyncio.sleep(1)
     await update.message.reply_text("Feuille ...")
     await asyncio.sleep(1)
     await update.message.reply_text("Ciseau ...")
     await asyncio.sleep(1)
-    result = random.choice(["ciseau","pierre","feuille"])
-    await update.message.reply_text(f"J'ai tire {result} et toi {choix} ")
-    if result == "ciseau" and choix == "ciseau":
+    
+    await update.message.reply_text(f"J'ai tire {result} et toi {player} ")
+    if result == player :
         await update.message.reply_text("😌️ Partie Nulle")
-    if result == "ciseau" and choix == "feuille":
+    elif (player == "ciseau" and result == "feuille") or \
+         (player == "pierre" and result == "ciseau") or \
+         (player == "feuille" and result == "pierre"):
+        await update.message.reply_text("✅ Tu as gagne ")
+    else :
         await update.message.reply_text("❌️ Tu as perdu")
-    if result == "ciseau" and choix == "pierre":
-        await update.message.reply_text("✅ Tu as gagne ")
-    if result == "feuille" and choix == "ciseau":
-        await update.message.reply_text("✅ Tu as gagne ")
-    if result == "feuille" and choix == "pierre":
-        await update.message.reply_text("❌️ Tu as perdu ")
-    if result == "feuille" and choix == "feuille":
-        await update.message.reply_text("😌️ Partie Nulle ")
-    if result == "pierre" and choix == "ciseau":
-        await update.message.reply_text("❌️ Tu as perdu")
-    if result == "pierre" and choix == "feuille":
-        await update.message.reply_text("✅ Tu as gagne ")
-    if result == "pierre" and choix == "pierre":
-        await update.message.reply_text("😌️ Partie Nulle ")
-       
+    nt +=1
+    return ConversationHandler.END
         
 async def squidgame(update,context):
     global user_numbers, nc, nt, nr
@@ -131,11 +128,14 @@ async def squidgame(update,context):
 
 async def quit(update,context):
     user = update.message.from_user.id
-    await update.message.reply_text(f"Vous avez quitter la partie joueur N°{user_numbers[user]} ")
-    user_numbers.clear()
-    nc = 0
-    nt = 0
-    nr = 0 
+    if user in user_numbers:
+        await update.message.reply_text(f"Vous avez quitté la partie, joueur N°{user_numbers[user]}")
+        del user_numbers[user]
+        nc = 0
+        nt = 0
+        nr = 0 
+    else:
+        await update.message.reply_text("Vous n'êtes pas encore dans la partie.")
 async def carre(update,context):
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
@@ -146,7 +146,7 @@ async def triangle(update,context):
     chefumi_result = await chefumi(update,context)
     result = random.randint(chefumi_result)
     await update.message.reply_text(f"Vous avez tirez le Triangle 🔺️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
-    
+  
     
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
@@ -521,7 +521,7 @@ async def clear(update,context):
         empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
-    if id != owner or own:
+    if id != owner and id != own:
         await update.message.reply_text("❌️ Permission Non Accorder Pour Cette Commande")
         return
     
