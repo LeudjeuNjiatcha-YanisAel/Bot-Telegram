@@ -61,7 +61,7 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
-    await update.message.reply_text("Vous Avez ete affecte sur le jeu de")
+    await update.message.reply_text("Vous Avez ete affecte sur le *Jeu Tire un de*",parse_mode="Markdown")
     result = random.randint(1,6)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : {result}")
     nc = nc + 1
@@ -91,8 +91,8 @@ async def squidgame(update,context):
 async def carre(update,context):
     dice_results = await dice(update,context)
     piece_results = await piece(update,context)
-    result = random.choice([dice_results,piece_results])
-    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : {result}")
+    result = random.randint(dice_results,piece_results)
+    await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
 
 async def triangle(update,context):
     result = random.choice(chefumi)
