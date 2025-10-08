@@ -15,7 +15,7 @@ from googleapiclient.discovery import build
 from google.genai import types 
 from google import genai
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder,CommandHandler,MessageHandler,ConversationHandler,filters,ContextTypes
+from telegram.ext import ApplicationBuilder,CommandHandler,MessageHandler,filters,ContextTypes
 
 TOKEN = "8404081837:AAF9lT_adIUY8ou8LPfdUDXNqqE6DDe86K0"
 USERS_FILE = "users.json"
@@ -27,7 +27,7 @@ URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token":FOOTBALL}
 
 google_news = GNews(language='fr',country='FR',period='7d',max_results=5)
-CHOIX = range(1)
+
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
@@ -54,9 +54,9 @@ if os.path.exists(USERS_FILE):
         except:
             users = {}
 
-nc = 0
-nt = 0
-nr = 0 
+nd = 0
+np = 0
+nc = 0 
 
 def save_users():
     with open(USERS_FILE, "w") as f:
@@ -69,24 +69,24 @@ async def dice(update,context):
     await asyncio.sleep(2)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
     nc +=1
-    return nc
+    return nd
     
 async def piece(update,context):
+    
     await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
     result = random.choice(["pile","face"])
     await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
     nc = nc + 1
-    return nc
+    return np
 
 async def chefumi(update,context):
-    global nt
     await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
-    player = update.message.text.lower()
+    player = "".join(context.args).lower()
     choice = ["pierre","feuille","ciseau"]
     
     if player not in choice:
-        await update.message.reply_text("⚠️ Usage : Tape pierre,feuille ou ciseau")
-        return CHOIX
+        await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
+        return
     
     result = random.choice(["ciseau","pierre","feuille"])
     
@@ -106,11 +106,8 @@ async def chefumi(update,context):
         await update.message.reply_text("✅ Tu as gagne ")
     else :
         await update.message.reply_text("❌️ Tu as perdu")
-    nt +=1
-    return ConversationHandler.END
-async def cancel(update,context):
-    await update.message.reply_text("Jeu annulée.")
-    return ConversationHandler.END
+    nc +=1
+    return nc
         
 async def squidgame(update,context):
     global user_numbers, nc, nt, nr
@@ -123,40 +120,26 @@ async def squidgame(update,context):
 
     await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮")
     await update.message.reply_text(f"Joueur N°{number}")
-    await update.message.reply_text(f"1. ◻️ Carré    Joueurs en ligne ({nc})")
-    await update.message.reply_text(f"2. 🔺 Triangle Joueurs en ligne ({nt})")
-    await update.message.reply_text(f"3. ⭕ Rond     Joueurs en ligne ({nr})")
+    await update.message.reply_text("Jeux Disponibles :")
+    await update.message.reply_text(f"1.    dice    Joueurs en ligne ({nc})")
+    await update.message.reply_text(f"2.    piece   Joueurs en ligne ({nt})")
+    await update.message.reply_text(f"3.    chefumi Joueurs en ligne ({nr})")
     await update.message.reply_text(" 4. ❌ Quitter la partie (/quit)")
-    await update.message.reply_text("Choisis une figure : /carre\n/triangle\n/rond")
+    await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
 
 async def quit(update,context):
-    global nc,nt,nr
+    global nc, nt, nr
     user = update.message.from_user.id
     if user in user_numbers:
         await update.message.reply_text(f"Vous avez quitté la partie, joueur N°{user_numbers[user]}")
         del user_numbers[user]
+        user_numbers[user].clear()
         nc = 0
         nt = 0
         nr = 0 
     else:
         await update.message.reply_text("Vous n'êtes pas encore dans la partie.")
-async def carre(update,context):
-    global nc
-    dice_results = await dice(update,context)
-    piece_results = await piece(update,context)
-    result = random.choice([dice_results,piece_results])
-    if result == dice_results : 
-        await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
-    if result == piece_results :
-        await update.message.reply_text(f"Vous avez tirez le Carre ◻️ \n Vous avez obtenu : *{result}*",parse_mode="Markdown")
-
-async def triangle(update,context):
-    chefumi_result = await chefumi(update,context)
-    result = chefumi_result
-    await update.message.reply_text(f"Vous avez tirez le Triangle 🔺️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
-    return
-  
-    
+      
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
 
@@ -530,7 +513,7 @@ async def clear(update,context):
         empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
-    if id != owner and id != own:
+    if id != owner or own:
         await update.message.reply_text("❌️ Permission Non Accorder Pour Cette Commande")
         return
     
@@ -990,16 +973,16 @@ def predict_match(home_rank, away_rank, home_form, away_form, home_goals, away_g
 
 # ---- Commande Telegram ----
 async def football(update,context):
+    # Afficher la liste des championnats disponibles
+    ligues_dispo = "\n".join([f"- {nom.title()}" for nom in leagues.keys()])
+    await update.message.reply_text(f"🏆 Championnats disponibles :\n + {ligues_dispo}")
     await update.message.reply_text("Recherche des matchs en cours et à venir... ⏳")
     await asyncio.sleep(3)
     
     if not context.args:
-        # Afficher la liste des championnats disponibles
-        ligues_dispo = "\n".join([f"- {nom.title()}" for nom in leagues.keys()])
         await update.message.reply_text(
             "Utilisation : /football <nom du championnat>\n"
             "Exemples : /football premier league, /football can\n\n"
-            "🏆 Championnats disponibles :\n" + ligues_dispo
         )
 
     league_name = " ".join(context.args).lower()
@@ -1021,7 +1004,7 @@ async def football(update,context):
     )
     response = requests.get(url, headers=headers)
     data = response.json()
-
+    await update.message.reply_text(f"✅ {data.get('count', 0)} matchs trouvés.")
     if "matches" not in data or not data["matches"]:
         await update.message.reply_text("Aucun match prévu ou joué pour cette période.")
         return
@@ -1104,11 +1087,8 @@ async def main():
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("carre",carre))
-    triangle_c = ConversationHandler(
-        entry_points=[CommandHandler("triangle",triangle)],
-        states={CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
-        fallbacks=[CommandHandler("cancel",cancel)])
-    app.add_handler(triangle_c)
+    app.add_handler(CommandHandler("triangle",triangle))
+    app.add_handler(CommandHandler("she",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
@@ -1145,13 +1125,6 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("msg",msg))
     app.add_handler(CommandHandler("send",send))
     app.add_handler(CommandHandler("about",about))
-    triangle_c = ConversationHandler(
-        entry_points=[CommandHandler("triangle",triangle)],
-        states={
-            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
-        fallbacks=[CommandHandler("cancel",cancel)])
-    app.add_handler(triangle_c)
-    app.add_handler(triangle_c)
     app.add_handler(CommandHandler("listusers",listusers))
     app.add_handler(CommandHandler("getid",getid))
     app.add_handler(CommandHandler("time",time))
@@ -1164,6 +1137,9 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("carre",carre))
+    app.add_handler(CommandHandler("she",chefumi))
+    app.add_handler(CommandHandler("piece",piece))
+    app.add_handler(CommandHandler("triangle",triangle))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
