@@ -147,7 +147,7 @@ async def carre(update,context):
 
 async def triangle(update,context):
     chefumi_result = await chefumi(update,context)
-    result = random.randint(chefumi_result)
+    result = chefumi_result
     await update.message.reply_text(f"Vous avez tirez le Triangle 🔺️ \n Vous avez obtenu : **{result}**",parse_mode="Markdown")
     return
   
@@ -1101,11 +1101,9 @@ async def main():
     app.add_handler(CommandHandler("carre",carre))
     triangle_c = ConversationHandler(
         entry_points=[CommandHandler("triangle",triangle)],
-        states={
-            CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
+        states={CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
         fallbacks=[CommandHandler("cancel",cancel)])
     app.add_handler(triangle_c)
-    app.add_handler(CommandHandler("she",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
@@ -1148,7 +1146,7 @@ if __name__ == "__main__":
             CHOIX: [MessageHandler(filters.TEXT & ~filters.COMMAND,chefumi)]},
         fallbacks=[CommandHandler("cancel",cancel)])
     app.add_handler(triangle_c)
-    app.add_handler(triangle)
+    app.add_handler(triangle_c)
     app.add_handler(CommandHandler("listusers",listusers))
     app.add_handler(CommandHandler("getid",getid))
     app.add_handler(CommandHandler("time",time))
@@ -1161,7 +1159,6 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
     app.add_handler(CommandHandler("carre",carre))
-    app.add_handler(CommandHandler("triangle",triangle))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
