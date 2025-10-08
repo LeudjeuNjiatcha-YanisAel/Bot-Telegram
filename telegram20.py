@@ -27,7 +27,7 @@ URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token":FOOTBALL}
 
 google_news = GNews(language='fr',country='FR',period='7d',max_results=5)
-NEWS = "a3f9296a48a446e8b0f3626481922e3a"
+
 youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
@@ -53,14 +53,39 @@ if os.path.exists(USERS_FILE):
         except:
             users = {}
 
+nc = 0
+nt = 0
+nr = 0 
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
     result = random.randint(1,6)
-    await update.message.reply_text(f"🎲 Le dé a roulé et a donné : {result}")
+    await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : {result}")
+    nc = nc + 1
+    
+async def piece(update,context):
+    result = random.randint("pile","face")
+    await update.message.reply_text(f"📀️ tu as obtenu : {result}")
+async def chefumi(update,context):
+   await update.message.reply_text("Veuillez Choisir Ciseau ✂️, Pierre 🔨 , Feuille 📝️") 
+    
+async def squidgame(update,context):
+    await update.message.reply_text("🎮️ Bienvenue Dans SquidGame! 🎮️")
+    number = random.randint(1,456)
+    await update.message.reply_text(f"Joueur Numero {number}")
+    await update.message.reply_text(f"1.◻️ Carre  (Joueur en ligne ({nc}))")
+    await update.message.reply_text(f"2.🔺️ Triangle (Joueur en ligne ({nt}))")
+    await update.message.reply_text(f"3.⭕️ Rond (Joueur en ligne ({nr}))")
+    await update.message.reply_text("Cette fonction est en cours de mise a jour ... ⏳")
+    
+async def carre(update,context):
+    result = random.choice(dice,piece)
 
+async def triangle(update,context):
+    result = random.choice(chefumi)
+    
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
 
@@ -103,7 +128,7 @@ async def start(update,context):
         "📰 /news sujet → Rechercher des actualités\n"
         "🌦 /meteo ville → Météo locale\n"
         "   /pp → Recupere La Photo de profil\n"
-        "   /squidgame → Demarrer Un Jeu"
+        "🎮️ /squidgame → Demarrer Un Jeu"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
@@ -434,7 +459,7 @@ async def clear(update,context):
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
     if id != owner:
-        await update.message.reply_text("Permission Non Accorder Pour Cette Commande")
+        await update.message.reply_text("❌️ Permission Non Accorder Pour Cette Commande")
         return
     
     if chat.type in ["group","supergroup"]:
@@ -876,9 +901,6 @@ async def sticker(update,context):
     #envoie du sticker
     await update.message.reply_sticker(sticker=output)
     
-async def squidgame(update,context):
-    await update.message.reply_text("Cette fonction est en cours de mise a jour ... ⏳")
-
 # ---- Fonction utilitaire pour prédiction ----
 def predict_match(home_rank, away_rank, home_form, away_form, home_goals, away_goals):
     """Retourne une prédiction simple basée sur classement, forme et buts."""
@@ -1009,6 +1031,8 @@ async def main():
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
+    app.add_handler(CommandHandler("she",chefumi))
+    app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
     app.add_handler(CommandHandler("news",news))
