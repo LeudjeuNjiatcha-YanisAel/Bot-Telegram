@@ -110,7 +110,7 @@ async def chefumi(update,context):
     return nc
         
 async def squidgame(update,context):
-    global user_numbers, nc, nt, nr
+    global user_numbers,nc,nt,nr
     user = update.message.from_user.id
     if user not in user_numbers:
         number = random.randint(1,456)
@@ -118,7 +118,7 @@ async def squidgame(update,context):
     else:
         number = user_numbers[user]
 
-    await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮")
+    await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
     await update.message.reply_text(f"Joueur N°{number}")
     await update.message.reply_text("Jeux Disponibles :")
     await update.message.reply_text(f"1.dice    Joueurs en ligne ({nc})")
@@ -128,7 +128,7 @@ async def squidgame(update,context):
     await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
 
 async def quit(update,context):
-    global nc, nt, nr
+    global nc,nt,nr
     user = update.message.from_user.id
     if user in user_numbers:
         await update.message.reply_text(f"Vous avez quitté la partie, joueur N°{user_numbers[user]}")
@@ -228,40 +228,41 @@ async def about(update,context):
 async def help_command(update,context):
     await update.message.reply_text(
         "📖 *Aide - Machine_11bot* 📖\n\n"
+        "Voici ce que je peux faire pour toi :\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🧮 *Mathématiques*\n"
-        "/app x y → Addition\n"
-        "/sub x y → Soustraction\n"
-        "/mul x y → Multiplication\n"
-        "/div x y → Division\n"
-        "/mod x y → Modulo\n\n"
+        "➕ /app x y → Addition\n"
+        "➖ /sub x y → Soustraction\n"
+        "✖️ /mul x y → Multiplication\n"
+        "➗ /div x y → Division\n"
+        "🪙 /mod x y → Modulo\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "💬 *Messagerie*\n"
-        "/msg chat_id texte → Envoyer un message\n"
-        "/send Nom message → Envoyer à un utilisateur\n"
-        "/clear → Nettoyer la messagerie\n"
-        "/listusers → Liste des utilisateurs\n"
-        "/getid → Voir ton ID\n\n"
+        "📨 /msg chat_id texte → Envoyer un message\n"
+        "📩 /send Nom message → Envoyer à un utilisateur\n"
+        "🧹 /clear → Nettoyer la messagerie\n"
+        "👥 /listusers → Liste des utilisateurs\n"
+        "🆔 /getid → Voir ton ID\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
-        "⚙️ *Autres*\n"
-        "/gen_phrase mots… → Générer une phrase\n"
-        "/pin → Générer un code PIN\n"
-        "/google → Ouvrir Google\n"
-        "/time ville → Heure locale\n"
-        "/play titre de la musique → Jouez une musique\n"
-        "/video nom de la video → Rechercher une video\n"
-        "/news sujet → Rechercher des actualités\n"
-        "/pp → Recupere La Photo de profil\n"
-        "/sticker → Transforme une photo en stickers\n"
-        "/squidgame → Demarrer Un Jeu\n"
-        "/meteo ville → Météo locale\n"
-        "/ask question → Poser une question au bot\n\n"
+        "⚙️ *Autres Fonctions*\n"
+        "📝 /gen_phrase mots… → Générer une phrase\n"
+        "🔑 /pin → Générer un code PIN\n"
+        "🌐 /google → Ouvrir Google\n"
+        "⏰ /time ville → Heure locale\n"
+        "🎼️ /play titre de la musique → Jouez une musique\n"
+        "▶️ /video nom de la video → Rechercher une video\n"
+        "📰 /news sujet → Rechercher des actualités\n"
+        "🌦 /meteo ville → Météo locale\n"
+        "📷️ /pp → Recupere La Photo de profil\n"
+        "🎮️ /squidgame → Demarrer Un Jeu\n"
+        "⚽ /football Nom du championnat → Voir les matchs de football en direct\n"
+        "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
-        "/ping → Verifie si le bot est en ligne\n"
-        "/help → Afficher cette aide\n"
-        "/about → Informations sur le bot\n"
-        "Mentionne-moi avec @NomDuBot dans un groupe pour discuter avec moi ! 🤖"
+        "❓ /help → Voir toutes les commandes\n"
+        "🎾️ /ping → Verifie si le bot est en ligne\n"
+        "🎏 /about → Infos sur le bot-telegram\n\n"
+        "_Mentionne-moi avec @NomDuBot dans un groupe pour discuter avec moi ! 🤖"
     )
 
 async def add(update,context):
@@ -1086,7 +1087,7 @@ async def main():
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
-    app.add_handler(CommandHandler("she",chefumi))
+    app.add_handler(CommandHandler("chefumi",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
@@ -1134,7 +1135,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
-    app.add_handler(CommandHandler("she",chefumi))
+    app.add_handler(CommandHandler("chefumi",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
@@ -1147,6 +1148,4 @@ if __name__ == "__main__":
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
     asyncio.run(main())
-
-   
 
