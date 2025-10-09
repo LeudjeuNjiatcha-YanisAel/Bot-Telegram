@@ -91,6 +91,7 @@ async def chefumi(update,context):
         choice = ["pierre","feuille","ciseau"] 
         if player not in choice:
             await update.message.reply_text("Veuillez Choisir Ciseau ✂️\t,Pierre 🔨\t,Feuille 📝️\t")
+            await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
             return
         
         result = random.choice(["ciseau","pierre","feuille"])
@@ -114,7 +115,7 @@ async def chefumi(update,context):
         nc +=1
         return nc
     except :
-        await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
+        await update.message.reply_text("...")
         
         
 async def squidgame(update,context):
