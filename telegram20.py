@@ -110,23 +110,22 @@ async def chefumi(update,context):
     return nc
         
 async def squidgame(update,context):
-    global user_numbers,nc,nt,nr
+    global user_numbers
     user = update.message.from_user.id
     if user not in user_numbers:
         number = random.randint(1,456)
         user_numbers[user] = number
+        await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
+        await update.message.reply_text(f"Joueur N°{number}")
+        await update.message.reply_text("Jeux Disponibles : ")
+        await update.message.reply_text(f"1.dice {nc} en ligne")
+        await update.message.reply_text(f"2.piece {nt} en ligne")
+        await update.message.reply_text(f"3.chefumi {nr} en ligne")
+        await update.message.reply_text(" 4. ❌ Quitter la partie (/quit)")
+        await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     else:
         number = user_numbers[user]
-
-    await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
-    await update.message.reply_text(f"Joueur N°{number}")
-    await update.message.reply_text("Jeux Disponibles :")
-    await update.message.reply_text(f"1.dice    Joueurs en ligne ({nc})")
-    await update.message.reply_text(f"2.piece   Joueurs en ligne ({nt})")
-    await update.message.reply_text(f"3.chefumi Joueurs en ligne ({nr})")
-    await update.message.reply_text(" 4. ❌ Quitter la partie (/quit)")
-    await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
-
+        
 async def quit(update,context):
     global nc,nt,nr
     user = update.message.from_user.id
@@ -514,7 +513,7 @@ async def clear(update,context):
         empty_block = "\n\n".join(["\u200E" for _ in range(100)])
         await update.message.reply_text("🧹 Nettoyage de ta messagerie en cours...\n\n" + empty_block + "\n\n✅ Messagerie nettoyée")
         return
-    if id != owner or own:
+    if id != owner and id != own:
         await update.message.reply_text("❌️ Permission Non Accorder Pour Cette Commande")
         return
     
