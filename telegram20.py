@@ -33,7 +33,6 @@ youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
 user_numbers = {}
 
-# ---- Dictionnaire ligues et sélections ----
 leagues = {
     "premier league": "PL",
     "la liga": "PD",
@@ -58,6 +57,8 @@ nd = 0
 np = 0
 nc = 0
 
+money = {}
+
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=4)
@@ -67,6 +68,10 @@ async def dice(update,context):
     result = random.randint(1,6)
     await asyncio.sleep(2)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
+    if(result == 6):
+        user = update.message.from_user.id
+        money[user] += 100
+        await update.message.reply_text(f"Votre gain est de {money[user]}")
     nd +=1
     return nd
     
@@ -84,7 +89,6 @@ async def chefumi(update,context):
         choice = ["pierre","feuille","ciseau"] 
         if player not in choice:
             await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
-            await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
             return
         
         result = random.choice(["ciseau","pierre","feuille"])
@@ -122,7 +126,7 @@ async def squidgame(update,context):
         await update.message.reply_text("Jeux Disponibles : ")
         await update.message.reply_text(f"1./dice en ligne {nd}")
         await update.message.reply_text(f"2./piece en ligne {np}")
-        await update.message.reply_text(f"3./chefumi en ligne {nc} ex : /chefumi ciseau")
+        await update.message.reply_text(f"3./shifumi en ligne {nc} ex : /chefumi ciseau")
         await update.message.reply_text("4./quit Quitter la partie ")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     else:
@@ -131,7 +135,7 @@ async def squidgame(update,context):
         await update.message.reply_text("Jeux Disponibles : ")
         await update.message.reply_text(f"1./dice en ligne  {nd}")
         await update.message.reply_text(f"2./piece en ligne {np}")
-        await update.message.reply_text(f"3./chefumi en ligne {nc} ex : /chefumi ciseau")
+        await update.message.reply_text(f"3./shifumi en ligne {nc} ex : /chefumi ciseau")
         await update.message.reply_text("4./quit Quitter la partie")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
         
@@ -1005,7 +1009,7 @@ async def football(update,context):
 
     # Période : aujourd'hui jusqu'à 14 jours dans le futur
     today = datetime.utcnow().date()
-    end_date = today + timedelta(days=14)
+    end_date = today + timedelta(days=7)
 
     url = (
         f"{URL}/competitions/{league_id}/matches"
@@ -1094,7 +1098,7 @@ async def main():
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
-    app.add_handler(CommandHandler("chefumi",chefumi))
+    app.add_handler(CommandHandler("shifumi",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
@@ -1142,7 +1146,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("squidgame",squidgame))
     app.add_handler(CommandHandler("play",play))
     app.add_handler(CommandHandler("dice",dice))
-    app.add_handler(CommandHandler("chefumi",chefumi))
+    app.add_handler(CommandHandler("shifumi",chefumi))
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
