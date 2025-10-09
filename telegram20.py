@@ -65,8 +65,6 @@ def save_users():
 
 async def dice(update,context):
     global nd,money
-    if user not in money:
-        money[user] = 0
     await update.message.reply_text("Vous avez choisir le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
     await asyncio.sleep(2)
@@ -1015,15 +1013,14 @@ async def football(update,context):
 
     # Période : aujourd'hui jusqu'à 14 jours dans le futur
     today = datetime.utcnow().date()
-    end_date = today + timedelta(days=7)
+    end_date = today + timedelta(days=14)
 
     url = (
         f"{URL}/competitions/{league_id}/matches"
         f"?dateFrom={today}&dateTo={end_date}&status=LIVE,FINISHED,SCHEDULED"
     )
-    response = requests.get(url, headers=headers)
+    response = requests.get(url,headers=headers)
     data = response.json()
-    matches = data.get("matches", [])
     if "matches" not in data or not data["matches"]:
         await update.message.reply_text("Aucun match prévu ou joué pour cette période.")
         return
