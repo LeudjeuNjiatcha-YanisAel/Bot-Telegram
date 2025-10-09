@@ -64,6 +64,9 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
+    global nd,money
+    if user not in money:
+        money[user] = 0
     await update.message.reply_text("Vous avez choisir le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
     await asyncio.sleep(2)
@@ -1020,6 +1023,7 @@ async def football(update,context):
     )
     response = requests.get(url, headers=headers)
     data = response.json()
+    matches = data.get("matches", [])
     if "matches" not in data or not data["matches"]:
         await update.message.reply_text("Aucun match prévu ou joué pour cette période.")
         return
