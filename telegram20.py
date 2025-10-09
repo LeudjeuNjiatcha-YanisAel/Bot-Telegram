@@ -112,20 +112,17 @@ async def chefumi(update,context):
 async def squidgame(update,context):
     global user_numbers
     user = update.message.from_user.id
-    number = random.randint(1,456)
-    user_numbers[user] = number
-    
-    await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
-    await update.message.reply_text(f"Joueur N°{number}")
-    await update.message.reply_text("Jeux Disponibles : ")
-    await update.message.reply_text(f"1.dice en ligne")
-    await update.message.reply_text(f"2.piece en ligne")
-    await update.message.reply_text(f"3.chefumi en ligne")
-    await update.message.reply_text("4.❌ Quitter la partie (/quit)")
-    await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     if user not in user_numbers:
         number = random.randint(1,456)
         user_numbers[user] = number
+        await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
+        await update.message.reply_text(f"Joueur N°{number}")
+        await update.message.reply_text("Jeux Disponibles : ")
+        await update.message.reply_text(f"1./dice en ligne ")
+        await update.message.reply_text(f"2./piece en ligne")
+        await update.message.reply_text(f"3./chefumi en ligne")
+        await update.message.reply_text("4.❌ Quitter la partie (/quit)")
+        await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     else:
         number = user_numbers[user]
         
