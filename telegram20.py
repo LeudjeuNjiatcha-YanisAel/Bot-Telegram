@@ -72,6 +72,9 @@ async def dice(update,context):
         user = update.message.from_user.id
         money[user] += 100
         await update.message.reply_text(f"Votre gain est de {money[user]}")
+    else :
+        money[user] += 0
+        await update.message.reply_text(f"Votre gain est de {money[user]}")
     nd +=1
     return nd
     
