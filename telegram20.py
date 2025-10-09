@@ -68,7 +68,7 @@ async def dice(update,context):
     result = random.randint(1,6)
     await asyncio.sleep(2)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
-    if(result == 6):
+    if result == 6:
         user = update.message.from_user.id
         money[user] += 100
         await update.message.reply_text(f"Votre gain est de {money[user]}")
