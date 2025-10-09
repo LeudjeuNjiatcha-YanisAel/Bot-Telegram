@@ -54,21 +54,20 @@ if os.path.exists(USERS_FILE):
         except:
             users = {}
 
-nd = 0
+nd = 0 
 np = 0
-nc = 0 
+nc = 0
 
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
-    global nc
     await update.message.reply_text("Vous Avez ete affecte sur le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
     await asyncio.sleep(2)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
-    nc +=1
+    nd +=1
     return nd
     
 async def piece(update,context):
@@ -76,7 +75,7 @@ async def piece(update,context):
     await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
     result = random.choice(["pile","face"])
     await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
-    nc = nc + 1
+    np = np + 1
     return np
 
 async def chefumi(update,context):
@@ -118,26 +117,33 @@ async def squidgame(update,context):
         await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
         await update.message.reply_text(f"Joueur N°{number}")
         await update.message.reply_text("Jeux Disponibles : ")
+        await update.message.reply_text(f"1./dice en ligne {nd}")
+        await update.message.reply_text(f"2./piece en ligne {np}")
+        await update.message.reply_text(f"3./chefumi en ligne {nc}")
+        await update.message.reply_text("4./quit Quitter la partie ")
+        await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
+    else:
+        number = user_numbers[user]
+        await update.message.reply_text(f"Tu es déjà dans la partie, joueur N°{number}")
+        await update.message.reply_text("Jeux Disponibles : ")
         await update.message.reply_text(f"1./dice en ligne ")
         await update.message.reply_text(f"2./piece en ligne")
         await update.message.reply_text(f"3./chefumi en ligne")
         await update.message.reply_text("4.❌ Quitter la partie (/quit)")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
-    else:
-        number = user_numbers[user]
         
 async def quit(update,context):
-    global nc,nt,nr
     user = update.message.from_user.id
     if user in user_numbers:
         await update.message.reply_text(f"Vous avez quitté la partie, joueur N°{user_numbers[user]}")
         del user_numbers[user]
         user_numbers[user].clear()
-        nc = 0
-        nt = 0
-        nr = 0 
     else:
         await update.message.reply_text("Vous n'êtes pas encore dans la partie.")
+    nd = 0
+    np = 0
+    nc = 0
+    return nd,np,nc 
       
 async def ping(update,context):
     await update.message.reply_text("🤖 MACHINE BOT \n \n\n🏓 Pong! Je suis en ligne ✅")
