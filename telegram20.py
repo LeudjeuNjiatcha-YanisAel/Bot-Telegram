@@ -63,7 +63,7 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
-    await update.message.reply_text("Vous Avez ete affecte sur le *Jeu Tire un Dé*",parse_mode="Markdown")
+    await update.message.reply_text("Vous avez choisir le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
     await asyncio.sleep(2)
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
@@ -72,41 +72,44 @@ async def dice(update,context):
     
 async def piece(update,context):
     
-    await update.message.reply_text("Vous Avez Tirer le jeu *pile ou face*",parse_mode = "Markdown")
+    await update.message.reply_text("Vous avez choisir le *pile ou face*",parse_mode = "Markdown")
     result = random.choice(["pile","face"])
     await update.message.reply_text(f"📀️ tu as obtenu : *{result}*",parse_mode = "Markdown")
     np = np + 1
     return np
 
 async def chefumi(update,context):
-    await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
-    player = "".join(context.args).lower()
-    choice = ["pierre","feuille","ciseau"]
-    
-    if player not in choice:
+    try :
+        player = "".join(context.args).lower()
+        choice = ["pierre","feuille","ciseau"] 
+        if player not in choice:
+            await update.message.reply_text("Veuillez Choisir Ciseau ✂️ \t, Pierre 🔨 \t, Feuille 📝️\t")
+            await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
+            return
+        
+        result = random.choice(["ciseau","pierre","feuille"])
+        
+        await update.message.reply_text("Pierre ...")
+        await asyncio.sleep(1)
+        await update.message.reply_text("Feuille ...")
+        await asyncio.sleep(1)
+        await update.message.reply_text("Ciseau ...")
+        await asyncio.sleep(1)
+        
+        await update.message.reply_text(f"J'ai tire {result} et toi {player} ")
+        if result == player :
+            await update.message.reply_text("😌️ Partie Nulle")
+        elif (player == "ciseau" and result == "feuille") or \
+            (player == "pierre" and result == "ciseau") or \
+            (player == "feuille" and result == "pierre"):
+            await update.message.reply_text("✅ Tu as gagne ")
+        else :
+            await update.message.reply_text("❌️ Tu as perdu")
+        nc +=1
+        return nc
+    except :
         await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
-        return
-    
-    result = random.choice(["ciseau","pierre","feuille"])
-    
-    await update.message.reply_text("Pierre ...")
-    await asyncio.sleep(1)
-    await update.message.reply_text("Feuille ...")
-    await asyncio.sleep(1)
-    await update.message.reply_text("Ciseau ...")
-    await asyncio.sleep(1)
-    
-    await update.message.reply_text(f"J'ai tire {result} et toi {player} ")
-    if result == player :
-        await update.message.reply_text("😌️ Partie Nulle")
-    elif (player == "ciseau" and result == "feuille") or \
-         (player == "pierre" and result == "ciseau") or \
-         (player == "feuille" and result == "pierre"):
-        await update.message.reply_text("✅ Tu as gagne ")
-    else :
-        await update.message.reply_text("❌️ Tu as perdu")
-    nc +=1
-    return nc
+        
         
 async def squidgame(update,context):
     global user_numbers
@@ -119,17 +122,17 @@ async def squidgame(update,context):
         await update.message.reply_text("Jeux Disponibles : ")
         await update.message.reply_text(f"1./dice en ligne {nd}")
         await update.message.reply_text(f"2./piece en ligne {np}")
-        await update.message.reply_text(f"3./chefumi en ligne {nc}")
+        await update.message.reply_text(f"3./chefumi en ligne {nc} ex : /chefumi ciseau")
         await update.message.reply_text("4./quit Quitter la partie ")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     else:
         number = user_numbers[user]
         await update.message.reply_text(f"Tu es déjà dans la partie, joueur N°{number}")
         await update.message.reply_text("Jeux Disponibles : ")
-        await update.message.reply_text(f"1./dice en ligne ")
-        await update.message.reply_text(f"2./piece en ligne")
-        await update.message.reply_text(f"3./chefumi en ligne")
-        await update.message.reply_text("4.❌ Quitter la partie (/quit)")
+        await update.message.reply_text(f"1./dice en ligne  {nd}")
+        await update.message.reply_text(f"2./piece en ligne {np}")
+        await update.message.reply_text(f"3./chefumi en ligne {nc} ex : /chefumi ciseau")
+        await update.message.reply_text("4./quit Quitter la partie")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
         
 async def quit(update,context):
@@ -983,7 +986,7 @@ async def football(update,context):
     ligues_dispo = "\n".join([f"- {nom.title()}" for nom in leagues.keys()])
     await update.message.reply_text(f"🏆 Championnats disponibles :\n + {ligues_dispo}")
     await update.message.reply_text("Recherche des matchs en cours et à venir... ⏳")
-    await asyncio.sleep(3)
+    await asyncio.sleep(2)
     
     if not context.args:
         await update.message.reply_text(
@@ -1010,7 +1013,6 @@ async def football(update,context):
     )
     response = requests.get(url, headers=headers)
     data = response.json()
-    await update.message.reply_text(f"data: {data}")  # Debug: afficher la réponse brute
     if "matches" not in data or not data["matches"]:
         await update.message.reply_text("Aucun match prévu ou joué pour cette période.")
         return
