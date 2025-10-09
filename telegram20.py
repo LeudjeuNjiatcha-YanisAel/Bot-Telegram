@@ -71,10 +71,10 @@ async def dice(update,context):
     await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*",parse_mode="Markdown")
     if result == 6:
         user = update.message.from_user.id
-        money[user] += 100
+        money[user] = 100
         await update.message.reply_text(f"Votre gain est de {money[user]}")
     else :
-        money[user] += 0
+        money[user] = 0
         await update.message.reply_text(f"Votre gain est de {money[user]}")
     nd +=1
     return nd
@@ -988,7 +988,6 @@ def predict_match(home_rank, away_rank, home_form, away_form, home_goals, away_g
     else:
         return "Match serré — nul probable 🤝"
 
-# ---- Commande Telegram ----
 async def football(update,context):
     # Afficher la liste des championnats disponibles
     ligues_dispo = "\n".join([f"- {nom.title()}" for nom in leagues.keys()])
