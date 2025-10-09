@@ -76,8 +76,6 @@ async def dice(update,context):
     else :
         money[user] = 0
         await update.message.reply_text(f"Votre gain est de {money[user]}FCFA")
-    nd +=1
-    return nd
     
 async def piece(update,context):
     
