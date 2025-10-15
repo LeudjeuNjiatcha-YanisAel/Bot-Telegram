@@ -72,10 +72,9 @@ async def dice(update,context):
     if result == 6:
         user = update.message.from_user.id
         money[user] = 100
-        await update.message.reply_text(f"Votre gain est de {money[user]}")
-    else :
-        money[user] = 0
         await update.message.reply_text(f"Votre gain est de {money[user]}FCFA")
+    else :
+        await update.message.reply_text("...")
     
 async def piece(update,context):
     
@@ -129,7 +128,7 @@ async def squidgame(update,context):
         await update.message.reply_text("Jeux Disponibles : ")
         await update.message.reply_text(f"1./dice en ligne {nd}")
         await update.message.reply_text(f"2./piece en ligne {np}")
-        await update.message.reply_text(f"3./shifumi en ligne {nc} ex : /chefumi ciseau")
+        await update.message.reply_text(f"3./shifumi en ligne {nc} ex : /shifumi ciseau")
         await update.message.reply_text("4./quit Quitter la partie ")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     else:
