@@ -64,17 +64,16 @@ def save_users():
         json.dump(users, f, indent=4)
 
 async def dice(update,context):
-    global nd,money
     await update.message.reply_text("Vous avez choisir le *Jeu Tire un Dé*",parse_mode="Markdown")
     result = random.randint(1,6)
     await asyncio.sleep(2)
-    await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*FCFA",parse_mode="Markdown")
+    await update.message.reply_text(f"🎲 Le dé a roulé tu as obtenu : *{result}*\n",parse_mode="Markdown")
     if result == 6:
         user = update.message.from_user.id
         money[user] = 100
-        await update.message.reply_text(f"Votre gain est de {money[user]}FCFA")
+        await update.message.reply_text(f"Votre gain est de {money[user]} FCFA")
     else :
-        await update.message.reply_text("...")
+        await update.message.reply_text(f"Votre gain est de {money[user]} FCFA")
     
 async def piece(update,context):
     
@@ -90,7 +89,7 @@ async def chefumi(update,context):
         choice = ["pierre","feuille","ciseau"] 
         if player not in choice:
             await update.message.reply_text("Veuillez Choisir Ciseau ✂️\t,Pierre 🔨\t,Feuille 📝️\t")
-            await update.message.reply_text("⚠️ Usage : Tape /pierre ou /feuille ou /ciseau")
+            await update.message.reply_text("⚠️ Usage : Tape /shifumi pierre ou /shifumi feuille ou /shifumi ciseau")
             return
         
         result = random.choice(["ciseau","pierre","feuille"])
@@ -126,18 +125,18 @@ async def squidgame(update,context):
         await update.message.reply_text("🎮 Bienvenue dans SquidGame! 🎮\t")
         await update.message.reply_text(f"Joueur N°{number}")
         await update.message.reply_text("Jeux Disponibles : ")
-        await update.message.reply_text(f"1./dice en ligne {nd}")
-        await update.message.reply_text(f"2./piece en ligne {np}")
-        await update.message.reply_text(f"3./shifumi en ligne {nc} ex : /shifumi ciseau")
+        await update.message.reply_text(f"1./dice")
+        await update.message.reply_text(f"2./piece")
+        await update.message.reply_text(f"3./shifumi ex : /shifumi ciseau")
         await update.message.reply_text("4./quit Quitter la partie ")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
     else:
         number = user_numbers[user]
         await update.message.reply_text(f"Tu es déjà dans la partie, joueur N°{number}")
         await update.message.reply_text("Jeux Disponibles : ")
-        await update.message.reply_text(f"1./dice en ligne  {nd}")
-        await update.message.reply_text(f"2./piece en ligne {np}")
-        await update.message.reply_text(f"3./shifumi en ligne {nc} ex : /chefumi ciseau")
+        await update.message.reply_text(f"1./dice")
+        await update.message.reply_text(f"2./piece")
+        await update.message.reply_text(f"3./shifumi ex : /shifumi ciseau")
         await update.message.reply_text("4./quit Quitter la partie")
         await update.message.reply_text("Choisis un jeu en tapant son nom (ex: /dice)")
         
@@ -196,7 +195,8 @@ async def start(update,context):
         "📰 /news sujet → Rechercher des actualités\n"
         "🌦 /meteo ville → Météo locale\n"
         "📷️ /pp → Recupere La Photo de profil\n"
-        "🎮️ /squidgame → Demarrer Un Jeu"
+        "📩 /sendall message → Envoyer un message a tous les utilisateurs\n"
+        "🎮️ /squidgame → Demarrer Un Jeu\n"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
@@ -215,9 +215,9 @@ async def about(update,context):
     await update.message.chat.send_action(action="typing")
     await asyncio.sleep(3)
     text = (
-        "╔════════════════════════════╗          \n"
+        "╔════════════════════════════╗\t\t\t\t\n"
         "     🤖 *Machine_11bot* 🤖\n"
-        "╚════════════════════════════╝           \n\n"
+        "╚════════════════════════════╝\t\t\t\t\n\n"
         "✨ *Version* : `20.6`\n"
         "💫 *Technologies* :\n"
         "   🥇 Python3\n"
@@ -270,6 +270,7 @@ async def help_command(update,context):
         "📷️ /pp → Recupere La Photo de profil\n"
         "🎮️ /squidgame → Demarrer Un Jeu\n"
         "⚽ /football Nom du championnat → Voir les matchs de football en direct\n"
+        "📩 /sendall message\n"
         "🤔 /ask question → Poser une question au bot\n\n"
         "━━━━━━━━━━━━━━━━━━━━━━━\n"
         "🆘 *Aide*\n"
@@ -553,6 +554,23 @@ async def send_online(app):
             await asyncio.gather(*tasks,return_exceptions=True)
         except Exception as e:
             print(f"Erreur en envoyant à {chat_id}: {e}")
+
+async def sendall(update,context):
+    id = update.message.from_user.id
+    owner = 5441882239
+    own = 7799721970
+    tasks = []
+    message = " ".join(context.args)
+    if str(id) == str(owner) or str(id) == str(own):
+        for chat_id in users.keys():
+            try:
+                task = asyncio.create_task(await app.bot.send_message(chat_id=int(chat_id),text=message))
+                tasks.append(task)
+                await asyncio.gather(*tasks,return_exceptions=True)
+            except Exception as e:
+                print(f"Erreur en envoyant à {chat_id}: {e}")
+    else :
+        await update.message.reply_text("❌ Vous Devez Etre Administrateur Pour Utiliser Cette Commande")
             
 async def auto_reply(update,context):
     await update.message.chat.send_action(action="typing")
@@ -1103,6 +1121,7 @@ async def main():
     app.add_handler(CommandHandler("piece",piece))
     app.add_handler(CommandHandler("video",youtube_se))
     app.add_handler(CommandHandler("football",football))
+    app.add_handler(CommandHandler("sendall",sendall))
     app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("quit",quit))
     app.add_handler(CommandHandler("meteo",meteo))
