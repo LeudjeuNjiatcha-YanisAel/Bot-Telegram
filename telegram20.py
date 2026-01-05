@@ -7,6 +7,7 @@ from datetime import date,timedelta,datetime
 import asyncio
 import json
 import os
+import time 
 from gnews import GNews
 from PIL import Image
 from io import BytesIO
