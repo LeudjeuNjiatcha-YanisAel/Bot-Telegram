@@ -1127,7 +1127,7 @@ async def handle_channel_message(update,context):
         
 async def main():
     keep_alive()
-    app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
+    app = ApplicationBuilder().token(TOKEN).build()
     
     app.add_handler(CommandHandler("start",start))
     app.add_handler(CommandHandler("ping",ping))
