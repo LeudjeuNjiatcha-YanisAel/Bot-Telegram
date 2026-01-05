@@ -488,7 +488,7 @@ async def local_time(city):
     print("Heure locale affichee avec succès !")
     return data1["formatted"]
 
-async def time(update,context): 
+async def times(update,context): 
     if not context.args:
         await update.message.reply_text("Utilisation : /time <Nom de la ville>")
         return
@@ -1144,7 +1144,7 @@ async def main():
     app.add_handler(CommandHandler("about",about))
     app.add_handler(CommandHandler("listusers",listusers))
     app.add_handler(CommandHandler("getid",getid))
-    app.add_handler(CommandHandler("time",time))
+    app.add_handler(CommandHandler("time",times))
     app.add_handler(CommandHandler("clear",clear))
     app.add_handler(CommandHandler("ask",ask))
     app.add_handler(CommandHandler("pp",pp))
@@ -1195,7 +1195,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("about",about))
     app.add_handler(CommandHandler("listusers",listusers))
     app.add_handler(CommandHandler("getid",getid))
-    app.add_handler(CommandHandler("time",time))
+    app.add_handler(CommandHandler("time",times))
     app.add_handler(CommandHandler("clear",clear))
     app.add_handler(CommandHandler("ask",ask))
     app.add_handler(CommandHandler("pp",pp))
