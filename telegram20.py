@@ -16,7 +16,7 @@ from google.genai import types
 from google import genai
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder,CommandHandler,MessageHandler,filters,ContextTypes
-
+-1003550027843
 TOKEN = "8404081837:AAF9lT_adIUY8ou8LPfdUDXNqqE6DDe86K0"
 USERS_FILE = "users.json"
 METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
@@ -1089,6 +1089,9 @@ async def football(update,context):
 
     await update.message.reply_text(message, parse_mode="Markdown")
 
+async def handle_channel_message(update,context):
+    print("Message reçu du canal")
+    print(update.channel_post.chat.id)
         
 async def main():
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
@@ -1125,7 +1128,8 @@ async def main():
     app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("quit",quit))
     app.add_handler(CommandHandler("meteo",meteo))
-   
+    app.add_handler(
+    MessageHandler(filters.ChatType.CHANNEL, handle_channel_message))
     print("Machine_Bot a démarré...")
     
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
@@ -1173,7 +1177,8 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("news",news))
     app.add_handler(CommandHandler("quit",quit))
     app.add_handler(CommandHandler("meteo",meteo))
-    
+    app.add_handler(
+    MessageHandler(filters.ChatType.CHANNEL, handle_channel_message))
     # Lancement du bot
     print("Machine_Bot a démarré...")
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
