@@ -1102,11 +1102,31 @@ def run_flask():
     port = int(os.environ.get("PORT", 3000))
     app.run(host="0.0.0.0", port=port)
 
+def keep_alive():
+    def ping_loop():
+        while True:
+            try:
+                url = os.environ.get(
+                    "RENDER_EXTERNAL_URL",
+                    "https://dashboard.render.com/web/srv-d596kp1r0fns73fjsn8g/deploys/dep-d5dpf5f5r7bs73c3eujg"
+                )
+                requests.get(url, timeout=10)
+                print("🏓 Ping Render OK")
+            except Exception as e:
+                print(f"❌ Ping échoué : {e}")
+            time.sleep(600)  # toutes les 10 minutes
+
+    t = threading.Thread(target=ping_loop)
+    t.daemon = True
+    t.start()
+
+
 async def handle_channel_message(update,context):
     print("Message reçu du canal")
     print(update.channel_post.chat.id)
         
 async def main():
+    keep_alive()
     app = ApplicationBuilder().token(TOKEN).post_init(send_online).build()
     
     app.add_handler(CommandHandler("start",start))
