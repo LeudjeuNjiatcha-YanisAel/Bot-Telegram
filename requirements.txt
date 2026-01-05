@@ -1,4 +1,5 @@
 python-telegram-bot==20.6
+flask==3.0.0
 requests
 google-api-python-client
 google-genai

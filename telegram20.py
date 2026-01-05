@@ -1,4 +1,6 @@
 import random
+import threading
+from flask import flask
 from random import shuffle
 import datetime
 from datetime import date,timedelta,datetime
@@ -16,7 +18,7 @@ from google.genai import types
 from google import genai
 from telegram import InlineKeyboardButton,InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder,CommandHandler,MessageHandler,filters,ContextTypes
--1003550027843
+
 TOKEN = "8404081837:AAF9lT_adIUY8ou8LPfdUDXNqqE6DDe86K0"
 USERS_FILE = "users.json"
 METEO_API  = "aa2133ea80381e8a274fc15873ff5677"
@@ -32,6 +34,9 @@ youtube_api = "AIzaSyCdMKKFAzmf3Y1aZ7yQw8FgXJC6uvDsJd8"
 youtube = build("youtube","v3",developerKey=youtube_api)
 users = {}
 user_numbers = {}
+
+# FLASK (uptime)
+app = Flask(__name__)
 
 leagues = {
     "premier league": "PL",
@@ -1089,6 +1094,14 @@ async def football(update,context):
 
     await update.message.reply_text(message, parse_mode="Markdown")
 
+@app.route("/")
+def home():
+    return "Bot Telegram actif 🚀"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 3000))
+    app.run(host="0.0.0.0", port=port)
+
 async def handle_channel_message(update,context):
     print("Message reçu du canal")
     print(update.channel_post.chat.id)
@@ -1136,7 +1149,8 @@ async def main():
     
     await app.run_polling()
   
-if __name__ == "__main__":    
+if __name__ == "__main__": 
+    threading.Thread(target=run_flask).start()   
     import nest_asyncio
     nest_asyncio.apply()  
 
