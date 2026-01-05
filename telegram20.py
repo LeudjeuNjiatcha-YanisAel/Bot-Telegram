@@ -1108,7 +1108,7 @@ def keep_alive():
             try:
                 url = os.environ.get(
                     "RENDER_EXTERNAL_URL",
-                    "https://dashboard.render.com/web/srv-d596kp1r0fns73fjsn8g/deploys/dep-d5dpf5f5r7bs73c3eujg"
+                    "https://bot-telegram-krsa.onrender.com"
                 )
                 requests.get(url, timeout=10)
                 print("🏓 Ping Render OK")
