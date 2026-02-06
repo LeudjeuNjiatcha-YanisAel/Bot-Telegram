@@ -80,45 +80,5 @@ if __name__ == "__main__":
 
     from telegram.ext import ApplicationBuilder
     import asyncio
-
-    app = ApplicationBuilder().token(TOKEN).build()
-
-    # Ajoute ici tes handlers, exactement comme dans main()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("ping",ping))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("add",add))
-    app.add_handler(CommandHandler("sub",sub))
-    app.add_handler(CommandHandler("mul",mul))
-    app.add_handler(CommandHandler("div",div))
-    app.add_handler(CommandHandler("mod",mod))
-    app.add_handler(CommandHandler("pin",pin))
-    app.add_handler(CommandHandler("gen_phrase",gen_phrase))
-    app.add_handler(CommandHandler("msg",msg))
-    app.add_handler(CommandHandler("send",send))
-    app.add_handler(CommandHandler("about",about))
-    app.add_handler(CommandHandler("listusers",listusers))
-    app.add_handler(CommandHandler("getid",getid))
-    app.add_handler(CommandHandler("time",times))
-    app.add_handler(CommandHandler("clear",clear))
-    app.add_handler(CommandHandler("ask",ask))
-    app.add_handler(CommandHandler("pp",pp))
-    app.add_handler(CommandHandler("sticker",sticker))
-    app.add_handler(CommandHandler("google",open_google))
-    app.add_handler(CommandHandler("squidgame",squidgame))
-    app.add_handler(CommandHandler("play",play))
-    app.add_handler(CommandHandler("dice",dice))
-    app.add_handler(CommandHandler("shifumi",chefumi))
-    app.add_handler(CommandHandler("piece",piece))
-    app.add_handler(CommandHandler("video",youtube_se))
-    app.add_handler(CommandHandler("football",football))
-    app.add_handler(CommandHandler("news",news))
-    app.add_handler(CommandHandler("quit",quit))
-    app.add_handler(CommandHandler("meteo",meteo))
-    app.add_handler(
-    MessageHandler(filters.ChatType.CHANNEL,handle_channel_message))
-    # Lancement du bot
-    print("Machine_Bot a démarré...")
-    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),auto_reply))
     
     asyncio.run(main())

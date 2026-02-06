@@ -29,7 +29,7 @@ async def play(update,context):
                 # On indique le modele de nom du fichier
                 "-o",output_path,
                 # La derniere etape c'est la recherche
-                f"ytsearch1:{music_query}"],check=True)
+                f"ytsearch1:{music_query}"],check=True,timeout=120)
         
             # Ici on liste les fichiers du dossier ça donne ts les fichiers contenus dans le dossier
             files = os.listdir(tmpdir)

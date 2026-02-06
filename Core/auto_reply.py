@@ -13,7 +13,6 @@ async def auto_reply(update,context):
     text = update.message.text.lower()
     sender = update.message.from_user.first_name
     print(f"Le client {sender} a envoye ce message : {text} au bot ")
-    
     if (update.message.chat.type != 'private') and (f"@{bot_username}" not in text):
         return
     text = text.replace(f"@{bot_username}", "").strip()
