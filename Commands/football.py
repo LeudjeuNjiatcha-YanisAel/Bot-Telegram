@@ -1,4 +1,4 @@
-from config import leagues,FOOTBALL,URL
+from Config.config import leagues,FOOTBALL,URL
 from datetime import datetime,timedelta
 import requests
 import asyncio

@@ -3,7 +3,7 @@ from datetime import datetime,timedelta,datetime
 from Commands.help import help_command
 from Commands.meteo import local_time
 from google import genai
-from config import GEMINI_API
+from Config.config import GEMINI_API
 
 
 async def auto_reply(update,context):

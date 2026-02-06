@@ -1,4 +1,4 @@
-from config import youtube_api
+from Config.config import youtube_api
 import asyncio
 from google import genai
 from google.genai import types

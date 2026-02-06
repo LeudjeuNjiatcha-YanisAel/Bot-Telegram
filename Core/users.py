@@ -1,7 +1,7 @@
 # core/users.py
 import json
 import os
-from config import USERS_FILE
+from Config.config import USERS_FILE
 
 users = {}
 

@@ -1,7 +1,7 @@
 import requests
 import datetime
 import json
-from config import KEY_TIME,METEO_API
+from Config.config import KEY_TIME,METEO_API
 
 async def met(city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={METEO_API}&units=metric&lang=fr"
