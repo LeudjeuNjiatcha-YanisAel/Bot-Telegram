@@ -1,4 +1,4 @@
-from meteo import local_time
+from Commands.meteo import local_time
 
 async def times(update,context): 
     if not context.args:
