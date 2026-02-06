@@ -1,6 +1,6 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 import threading
-from config import TOKEN
+from Config.config import TOKEN
 from uptimebot import run_flask,keep_alive
 
 from Core.startup import start, about
